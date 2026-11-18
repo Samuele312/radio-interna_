@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radio Interna</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%93%BB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =================== STILE (radio roleplay) =================== */
+:root{
+  --rosso:#d0202d; --verde:#2fd27a; --giallo:#f4c430; --grigio:#8b8b8b;
+  --riga:rgba(38,38,40,.88); --riga-hover:rgba(64,64,68,.95); --pannello:rgba(22,22,24,.55);
+  --arancio:#f08a24; --testo:#f1f1f1; --tenue:#b9b9b9;
+  --oswald:'Oswald','Arial Narrow',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;color:var(--testo);font-family:'Barlow',system-ui,sans-serif;overflow:hidden}
+body{background:#140406}
+#sfondo{position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(ellipse 60% 55% at 50% 38%,rgba(235,70,80,.55),transparent 70%),
+             radial-gradient(ellipse at center,#8f1520 0%,#4a070d 55%,#170306 100%)}
+#sfondo::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 2px,transparent 2px 4px)}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:14px;color:var(--testo);background:rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,.14);border-radius:4px;padding:8px 10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--rosso)}
+select option{background:#222}
+svg{width:1em;height:1em;fill:currentColor;flex:none}
+[hidden]{display:none!important}
+.schermo{position:fixed;inset:0;display:flex;flex-direction:column}
+
+/* ---------- accesso / attesa ---------- */
+#scr-accesso,#scr-attesa{align-items:center;justify-content:center;padding:20px;overflow:auto}
+.box{width:100%;max-width:440px;background:rgba(18,18,20,.88);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
+.box-testa{background:linear-gradient(#e0303b,#a3101b);padding:16px;text-align:center}
+.box-testa h1{margin:0;font-family:var(--oswald);letter-spacing:3px;font-size:26px}
+.box-testa p{margin:4px 0 0;font-size:12px;opacity:.85;letter-spacing:1px}
+.box-tabs{display:flex}
+.box-tabs button{flex:1;background:rgba(255,255,255,.04);border:0;color:var(--tenue);padding:12px 6px;font-family:var(--oswald);letter-spacing:1px;font-size:14px}
+.box-tabs button.att{background:transparent;color:#fff;box-shadow:inset 0 -3px var(--rosso)}
+.box form,.box .corpo{display:flex;flex-direction:column;gap:10px;padding:18px}
+.box label{font-size:12px;color:var(--tenue);letter-spacing:.5px;text-transform:uppercase;margin-bottom:-6px}
+.btn{background:var(--rosso);border:0;color:#fff;padding:10px 14px;border-radius:4px;font-family:var(--oswald);letter-spacing:1px;font-size:15px}
+.btn:hover{filter:brightness(1.12)} .btn:disabled{opacity:.5;cursor:default}
+.btn.sec{background:rgba(255,255,255,.1)} .btn.verde{background:#1f9d58} .btn.picc{padding:6px 10px;font-size:13px}
+.nota{font-size:12px;color:var(--tenue);line-height:1.45}
+.nota code,.codice{background:rgba(0,0,0,.45);padding:2px 6px;border-radius:3px;font-family:ui-monospace,monospace;color:#fff}
+
+/* ---------- applicazione ---------- */
+#scr-app{padding:12px 20px 0}
+.tabs{display:flex;gap:8px;align-items:center}
+.tab{background:rgba(120,10,18,.55);border:0;color:#e9b7bb;font-family:var(--oswald);font-size:18px;letter-spacing:1.5px;padding:6px 14px;border-radius:3px}
+.tab.att{background:var(--rosso);color:#fff}
+.tab .badge{background:#fff;color:var(--rosso);border-radius:9px;font-size:12px;padding:0 6px;margin-left:6px}
+.spazio{flex:1}
+.chi{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--tenue);background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);
+  padding:5px 10px;border-radius:4px}
+.chi b{color:#fff}
+.btn-panico{background:linear-gradient(#e0303b,#8e0d16);border:1px solid #ff6b74;color:#fff;font-family:var(--oswald);letter-spacing:1.5px;
+  padding:6px 14px;border-radius:4px;position:relative;overflow:hidden;font-size:15px;user-select:none;touch-action:none}
+.btn-panico i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.35)}
+.barra-titolo{margin-top:10px;display:flex;align-items:center;gap:16px;background:rgba(150,150,155,.28);border:1px solid rgba(255,255,255,.12);
+  border-radius:4px;padding:12px 18px;backdrop-filter:blur(3px)}
+.barra-titolo h1{margin:0;font-family:'Barlow';font-weight:500;font-size:24px;letter-spacing:3px;flex:1}
+.pillola{display:flex;flex-direction:column;align-items:center;gap:2px}
+.pillola small{font-size:11px;letter-spacing:1.5px;opacity:.8}
+.pillola span{display:flex;align-items:center;gap:8px;background:#1f9d58;border-radius:4px;padding:6px 16px;font-family:var(--oswald);letter-spacing:2px;font-size:16px;text-transform:uppercase}
+.pillola.off span{background:#555}
+.pillola.tx span{background:var(--rosso);animation:pulsa 1s infinite}
+.pillola.parlo span{box-shadow:0 0 0 3px rgba(47,210,122,.8)}
+.barra-titolo .dx{flex:1;display:flex;justify-content:flex-end}
+.selezione-stato{display:flex;gap:4px;background:rgba(24,24,26,.9);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:4px}
+.selezione-stato button{display:flex;align-items:center;gap:6px;background:none;border:0;color:var(--tenue);padding:5px 10px;border-radius:3px;font-weight:600}
+.selezione-stato button.att{background:rgba(255,255,255,.12);color:#fff}
+
+.emergenze{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.btn-emerg{display:flex;align-items:center;gap:7px;background:rgba(24,24,26,.92);border:1px solid rgba(255,255,255,.12);border-left:3px solid var(--rosso);
+  color:#fff;padding:5px 10px;border-radius:3px;font-weight:700;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;line-height:1}
+.btn-emerg:hover{background:var(--riga-hover)}
+.btn-emerg .n{background:rgba(255,255,255,.12);border-radius:8px;padding:2px 6px;font-size:11px;color:var(--tenue)}
+.btn-emerg.attivo{background:linear-gradient(#e0303b,#a3101b);border-color:#ff6b74;animation:pulsa 1.1s infinite}
+@keyframes pulsa{0%,100%{box-shadow:0 0 0 0 rgba(255,60,70,.6)}50%{box-shadow:0 0 0 6px rgba(255,60,70,0)}}
+#chiamate{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chiamata{display:flex;align-items:center;gap:10px;background:rgba(208,32,45,.9);border-radius:4px;padding:6px 8px 6px 12px;font-weight:600;animation:pulsa 1.2s infinite}
+.chiamata.parla{outline:2px solid var(--verde)}
+#connessione{background:#7a5a10;border-radius:4px;padding:6px 12px;margin-top:8px;font-weight:600;font-size:14px}
+
+/* area centrale: colonne radio + pannello messaggi */
+.centro{flex:1;min-height:0;display:flex;gap:16px;margin-top:10px}
+.vista-radio{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
+.sezioni{display:flex;gap:8px;flex-wrap:wrap}
+.sez-tab{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:150px;padding:7px 16px 7px 14px;
+  background:rgba(24,24,26,.92);border:1px solid rgba(255,255,255,.1);border-bottom:3px solid var(--col);border-radius:4px;color:#fff;text-align:left;cursor:pointer}
+.sez-tab b{font-family:var(--oswald);font-size:20px;letter-spacing:1.5px;line-height:1.1}
+.sez-tab small{font-size:11px;font-weight:600;letter-spacing:.6px;color:var(--tenue);text-transform:uppercase}
+.sez-tab:hover{background:var(--riga-hover)}
+.sez-tab.att{background:linear-gradient(color-mix(in srgb,var(--col) 70%,#000 30%),color-mix(in srgb,var(--col) 40%,#000 60%));border-color:color-mix(in srgb,var(--col) 80%,#fff 20%)}
+.sez-tab.att small{color:#fff;opacity:.85}
+.sez-tab .mia{position:absolute;top:5px;right:6px;font-size:10px;background:#f2f2f2;color:#222;border-radius:3px;padding:1px 5px;font-weight:700}
+.sez-tab.voce::after{content:'';position:absolute;top:8px;right:-4px;width:9px;height:9px;border-radius:50%;background:var(--verde);box-shadow:0 0 8px var(--verde)}
+.griglia{flex:1;min-height:0;min-width:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(232px,1fr);grid-template-rows:minmax(0,1fr);gap:14px;overflow-x:auto;padding-bottom:8px}
+.colonna{display:flex;flex-direction:column;min-height:0;background:var(--pannello);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:6px}
+.colonna h2{margin:0 0 6px;text-align:center;font-family:var(--oswald);font-weight:700;font-size:24px;letter-spacing:1px;text-transform:uppercase;padding:4px 6px;border-radius:2px;line-height:1.15;
+  background:linear-gradient(color-mix(in srgb,var(--col) 85%,#fff 15%),color-mix(in srgb,var(--col) 80%,#000 20%));text-shadow:0 2px 2px rgba(0,0,0,.4)}
+.colonna h2 small{display:block;font-family:'Barlow';font-size:11px;font-weight:600;letter-spacing:2px;opacity:.85}
+.colonna.fuori h2{background:linear-gradient(#55555a,#37373b)}
+.col-corpo{overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:3px}
+.riga-canale{display:flex;align-items:center;gap:8px;background:var(--riga);padding:6px 8px;cursor:pointer;font-weight:700;text-transform:uppercase;font-size:15px;letter-spacing:.3px;border-radius:2px}
+.riga-canale:hover{background:var(--riga-hover)}
+.nome-canale{flex:1;padding:1px 8px;margin-left:-8px;border-radius:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.canale.mio .nome-canale{background:#f2f2f2;color:#222}
+.canale.bloccato .riga-canale{opacity:.5;cursor:not-allowed}
+.canale.drop .riga-canale{outline:2px dashed var(--verde)}
+.canale.ascolto .riga-canale{box-shadow:inset 3px 0 #6cb8ff}
+.conta{display:flex;align-items:center;gap:4px;color:#e0454f;font-size:14px}
+.conta.pieno{color:var(--verde)}
+.btn-ascolta{background:none;border:1px solid rgba(255,255,255,.15);color:#aaa;border-radius:3px;padding:1px 5px;font-size:13px;display:flex}
+.btn-ascolta.on{color:#6cb8ff;border-color:#6cb8ff}
+.chev{background:none;border:0;color:#ddd;font-size:16px;display:flex;padding:2px;transition:transform .15s}
+.chev.giu{transform:rotate(180deg)}
+.utenti{background:rgba(20,20,22,.8);padding:4px 6px 6px;display:flex;flex-direction:column;gap:3px}
+.utente{display:flex;align-items:center;gap:8px;background:rgba(40,40,42,.7);padding:5px 8px;border-radius:3px;font-size:15px;border:1px solid transparent;transition:border-color .1s,box-shadow .1s}
+.utente[draggable=true]{cursor:grab}
+.utente.parla{border-color:var(--verde);box-shadow:0 0 8px rgba(47,210,122,.55)}
+.utente .nome-ut{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pallino{width:13px;height:13px;border-radius:50%;flex:none;background:var(--verde);box-shadow:inset 0 -2px 2px rgba(0,0,0,.3);display:inline-block}
+.st-inattivo{background:var(--giallo)} .st-offline{background:var(--grigio)}
+.grado{background:var(--arancio);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.icone-ut{margin-left:auto;display:flex;gap:6px;align-items:center;color:#ff5a64;font-size:15px}
+.tag{font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;color:#fff;background:var(--rosso)}
+.tag.blu{background:#2f6fb5} .tag.grigio{background:#555}
+.vuoto{color:var(--tenue);font-size:13px;text-align:center;padding:14px}
+
+/* pannello messaggi */
+#pannello-msg{width:330px;flex:none;display:flex;flex-direction:column;background:rgba(18,18,20,.82);border:1px solid rgba(255,255,255,.08);border-radius:4px;min-height:0}
+.pm-testa{display:flex;align-items:center;gap:8px;padding:8px 10px;background:linear-gradient(#e0303b,#a3101b);font-family:var(--oswald);letter-spacing:1px;border-radius:4px 4px 0 0}
+.pm-testa button{background:none;border:0;color:#fff;font-size:18px}
+#pm-lista{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.msg{background:rgba(255,255,255,.06);border-radius:4px;padding:6px 8px;font-size:14px;line-height:1.35;word-wrap:break-word}
+.msg .chi-msg{font-weight:700;font-size:12px;color:#ffd0a0;display:flex;gap:6px;align-items:center}
+.msg .chi-msg time{margin-left:auto;color:var(--tenue);font-weight:500}
+.msg.mio{background:rgba(31,157,88,.18)}
+.msg.sistema{background:rgba(208,32,45,.25);border-left:3px solid var(--rosso)}
+.pm-codici{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;border-top:1px solid rgba(255,255,255,.07)}
+.pm-codici button{background:rgba(255,255,255,.08);border:0;color:#ddd;border-radius:10px;padding:3px 9px;font-size:12px}
+.pm-codici button:hover{background:var(--rosso);color:#fff}
+#pm-form{display:flex;gap:6px;padding:8px}
+#pm-form input{flex:1;min-width:0}
+
+/* barra comandi */
+.controlli{display:flex;align-items:center;gap:8px;padding:10px 0 12px;flex-wrap:wrap}
+.ctrl{display:flex;align-items:center;gap:8px;background:rgba(24,24,26,.9);border:1px solid rgba(255,255,255,.1);color:#fff;padding:9px 13px;border-radius:4px;font-weight:600;font-size:14px}
+.ctrl:hover{background:var(--riga-hover)}
+.ctrl svg{font-size:19px}
+.ctrl.off{background:#7a121a;border-color:#ff5a64}
+.ctrl .badge{background:var(--rosso);border-radius:9px;font-size:11px;padding:0 6px}
+.ptt-grande{display:flex;align-items:center;gap:8px;background:linear-gradient(#2a2a2e,#1a1a1c);border:1px solid rgba(255,255,255,.15);color:#fff;
+  padding:9px 18px;border-radius:24px;font-family:var(--oswald);letter-spacing:1px;font-size:15px;user-select:none;touch-action:none}
+.ptt-grande.on{background:linear-gradient(#26c26d,#178a4b);border-color:#6ef0a7;box-shadow:0 0 14px rgba(47,210,122,.6)}
+#ind-tx{font-weight:700;font-size:13px;letter-spacing:1px;color:var(--tenue)}
+#ind-tx.on{color:var(--verde)}
+
+/* amministrazione */
+#vista-admin{flex:1;min-height:0;overflow-y:auto;margin-top:10px;padding-bottom:12px}
+.admin-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;position:sticky;top:0;z-index:2;padding:6px;border-radius:6px;background:rgba(40,6,10,.92)}
+.admin-nav button{background:rgba(24,24,26,.92);border:1px solid rgba(255,255,255,.1);color:var(--tenue);font-family:var(--oswald);letter-spacing:1px;font-size:15px;padding:7px 14px;border-radius:4px}
+.admin-nav button.att{background:var(--rosso);color:#fff;border-color:var(--rosso)}
+.card{background:rgba(20,20,22,.88);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:14px;margin-bottom:10px}
+.card h3{margin:0 0 8px;font-family:var(--oswald);letter-spacing:1px;font-weight:600}
+.riga-form{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.meta{font-size:13px;color:var(--tenue);margin-bottom:8px;line-height:1.5}
+.meta b{color:#fff}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-family:var(--oswald);font-weight:500;letter-spacing:1px;color:var(--tenue);padding:6px;border-bottom:1px solid rgba(255,255,255,.1)}
+td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.05)}
+td input,td select{width:100%;padding:6px 8px}
+.ico-btn{background:rgba(255,255,255,.08);border:0;color:#fff;border-radius:4px;padding:6px 9px;font-size:14px}
+.ico-btn:hover{background:rgba(255,255,255,.18)}
+.ico-btn.rosso:hover{background:var(--rosso)}
+.cat-testa{display:grid;grid-template-columns:1fr 60px 170px 160px auto auto;gap:8px;align-items:center}
+.sez-testa{display:grid;grid-template-columns:1fr 60px auto auto;gap:8px;align-items:center;margin-bottom:6px}
+.titolo-sez{font-family:var(--oswald);letter-spacing:2px;font-size:20px;margin:18px 0 8px;padding-left:10px;border-left:5px solid var(--col)}
+.cat-radio{margin-top:10px;display:flex;flex-direction:column;gap:6px;padding-left:14px;border-left:3px solid var(--col,#c8102e)}
+.cat-radio .r{display:grid;grid-template-columns:1fr 210px auto;gap:6px}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tenue);white-space:nowrap}
+input[type=color]{padding:2px;height:36px;width:100%}
+.reg{display:flex;gap:10px;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px}
+.reg time{color:var(--tenue);white-space:nowrap;font-size:12px;min-width:110px}
+.reg.panico{color:#ff8f96;font-weight:700}
+
+/* finestre, menu, avvisi */
+#menu-ctx{position:fixed;z-index:50;min-width:230px;max-height:70vh;overflow-y:auto;background:rgba(18,18,20,.97);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#menu-ctx .tit{font-family:var(--oswald);letter-spacing:1px;padding:4px 8px 8px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:4px}
+#menu-ctx .sez{font-size:11px;color:var(--tenue);letter-spacing:1px;text-transform:uppercase;padding:6px 8px 2px}
+#menu-ctx button{display:block;width:100%;text-align:left;background:none;border:0;color:#fff;padding:6px 10px;border-radius:4px;font-size:14px}
+#menu-ctx button:hover{background:var(--rosso)}
+#menu-ctx .vol{padding:6px 10px;display:flex;align-items:center;gap:8px;font-size:13px}
+#menu-ctx .vol input{flex:1;padding:0}
+#menu-ctx .sposta-in{width:calc(100% - 12px);margin:4px 6px 6px}
+#modale{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+#modale .box{max-width:500px}
+.misuratore{height:10px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden;position:relative}
+.misuratore i{display:block;height:100%;width:0;background:var(--verde);transition:width .08s}
+.misuratore b{position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff}
+.scelta{display:flex;gap:6px}
+.scelta button{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#ccc;border-radius:4px;padding:8px;font-weight:600}
+.scelta button.att{background:var(--rosso);color:#fff;border-color:var(--rosso)}
+#toasts{position:fixed;right:18px;bottom:18px;z-index:70;display:flex;flex-direction:column;gap:8px}
+.toast{background:rgba(20,20,22,.96);border-left:4px solid var(--verde);padding:10px 14px;border-radius:4px;max-width:360px;box-shadow:0 6px 20px rgba(0,0,0,.5);font-size:14px;animation:entra .2s}
+.toast.err{border-color:var(--rosso)}
+@keyframes entra{from{transform:translateX(30px);opacity:0}}
+#sblocca-audio{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:45;background:#1f9d58;padding:10px 18px;border-radius:4px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+/* allarme panico: arriva a tutti, lampeggia e non si chiude finché non si conferma */
+#allarme{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden;background:#3a0006}
+#allarme[hidden]{display:none}
+#allarme::before,#allarme::after{content:'';position:absolute;top:0;bottom:0;width:60%;pointer-events:none;mix-blend-mode:screen}
+#allarme::before{left:-10%;background:radial-gradient(ellipse at 20% 50%,rgba(255,25,40,.95),transparent 65%);animation:strobo-r .9s steps(1) infinite}
+#allarme::after{right:-10%;background:radial-gradient(ellipse at 80% 50%,rgba(40,100,255,.9),transparent 65%);animation:strobo-b .9s steps(1) infinite}
+@keyframes strobo-r{0%{opacity:1}15%{opacity:.1}30%{opacity:1}45%{opacity:0}100%{opacity:0}}
+@keyframes strobo-b{0%,45%{opacity:0}50%{opacity:1}65%{opacity:.1}80%{opacity:1}95%{opacity:0}}
+#allarme .box{position:relative;z-index:1;max-width:560px;width:100%;border:3px solid #ff3b47;box-shadow:0 0 0 6px rgba(255,59,71,.3),0 0 80px rgba(255,30,40,.9);
+  animation:scossa .5s cubic-bezier(.36,.07,.19,.97) 3, battito 1.2s ease-in-out 1.5s infinite}
+@keyframes scossa{10%,90%{transform:translateX(-3px) rotate(-.5deg)}20%,80%{transform:translateX(6px) rotate(.5deg)}30%,50%,70%{transform:translateX(-12px) rotate(-1deg)}40%,60%{transform:translateX(12px) rotate(1deg)}}
+@keyframes battito{50%{box-shadow:0 0 0 14px rgba(255,59,71,.15),0 0 120px rgba(255,30,40,1)}}
+#allarme .box-testa{background:linear-gradient(#e0303b,#8e0d16)}
+#allarme h1{font-size:46px;letter-spacing:4px;text-align:center;animation:titolo-pan .6s steps(1) infinite}
+@keyframes titolo-pan{50%{color:#ffd0d3}}
+#allarme .campo-pan{margin:10px 0;padding:12px 14px;border-radius:6px;background:rgba(255,59,71,.12);border-left:5px solid #ff3b47}
+#allarme .campo-pan small{display:block;font-size:12px;letter-spacing:2px;color:#ff9aa1;font-weight:700}
+#allarme .campo-pan b{font-size:24px;line-height:1.2}
+#allarme-ok{font-size:18px;padding:14px}
+@media (max-width:500px){#allarme h1{font-size:32px;letter-spacing:2px}}
+#allarme-ok:disabled{opacity:.5}
+/* modulo per inviare il panico */
+#panico-form{position:fixed;inset:0;z-index:150;background:rgba(40,0,4,.85);display:flex;align-items:center;justify-content:center;padding:16px}
+#panico-form[hidden]{display:none}
+#panico-form .box{max-width:480px;width:100%;border:2px solid #ff3b47}
+#panico-form .box-testa{background:linear-gradient(#e0303b,#8e0d16)}
+.motivi{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.motivi button{background:rgba(255,59,71,.15);border:1px solid rgba(255,59,71,.5);color:#fff;border-radius:14px;padding:5px 11px;font-size:13px}
+.motivi button:hover{background:#c4101d}
+.btn.rosso{background:linear-gradient(#e0303b,#8e0d16);border-color:#ff6b74}
+/* soundboard */
+#soundboard{position:fixed;right:16px;bottom:74px;z-index:95;width:min(420px,calc(100vw - 32px));background:rgba(18,18,20,.97);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.6);padding:12px}
+#soundboard[hidden]{display:none}
+#soundboard h3{margin:0 0 4px;font-family:var(--oswald);letter-spacing:2px;font-size:18px}
+#soundboard .nota{margin-bottom:8px}
+.sb-griglia{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sb-griglia button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.1);
+  background:linear-gradient(#26262a,#1a1a1d);color:#fff;font-weight:700;font-size:12px;cursor:pointer}
+.sb-griglia button span{font-size:24px}
+.sb-griglia button:hover{border-color:var(--verde)}
+.sb-griglia button.suona{background:linear-gradient(#1f9d58,#13713e)}
+.grande{font-size:20px;font-weight:700;color:#fff}
+
+/* modalità radio (telefono usato come radio mentre si gioca a Roblox) */
+#radio-tel{position:fixed;inset:0;z-index:90;background:radial-gradient(circle at 50% 40%,#2a1012,#0b0b0d 70%);display:flex;flex-direction:column;align-items:center;
+  justify-content:space-between;padding:22px 16px calc(22px + env(safe-area-inset-bottom));color:#fff;user-select:none;-webkit-user-select:none;touch-action:none}
+#radio-tel[hidden]{display:none}
+#radio-tel .rt-testa{text-align:center}
+#radio-tel .rt-cat{font-size:14px;letter-spacing:3px;color:var(--tenue);text-transform:uppercase}
+#radio-tel .rt-nome{font-family:var(--oswald);font-size:34px;letter-spacing:2px;margin-top:4px}
+#radio-tel .rt-parla{min-height:26px;margin-top:10px;font-weight:700;color:var(--verde)}
+#tel-ptt{width:min(78vw,62vh,420px);aspect-ratio:1;border-radius:50%;border:8px solid rgba(255,255,255,.15);font-family:var(--oswald);font-size:30px;letter-spacing:2px;color:#fff;
+  background:radial-gradient(circle at 40% 35%,#d43a44,#8d111b);box-shadow:0 20px 60px rgba(0,0,0,.6);touch-action:none;cursor:pointer}
+#tel-ptt.on{background:radial-gradient(circle at 40% 35%,#4fe07a,#178a3c);box-shadow:0 0 0 14px rgba(63,209,106,.25),0 0 80px rgba(63,209,106,.6)}
+#tel-ptt:disabled{opacity:.45}
+#radio-tel .rt-basso{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#radio-tel .rt-basso button{padding:12px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-weight:700;font-size:15px}
+@media (max-width:1000px){
+  #pannello-msg{position:fixed;right:10px;top:150px;bottom:70px;z-index:30;width:min(360px,calc(100% - 20px))}
+}
+@media (max-width:800px){
+  #scr-app{padding:8px 8px 0}
+  .barra-titolo{flex-wrap:wrap;padding:8px}
+  .barra-titolo h1{font-size:18px}
+  .cat-testa,.cat-radio .r,.sez-testa{grid-template-columns:1fr 1fr}
+  .sez-tab{min-width:0;flex:1}
+  .chi span.lungo{display:none}
+}
+
+/* ---- accessibilità ---- */
+.sr-solo{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid #fff!important;outline-offset:2px;box-shadow:0 0 0 5px rgba(0,0,0,.65)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+body.alto-contrasto{--rosso:#ff2d3c;--verde:#3dff95;--giallo:#ffe14d;background:#000!important;color:#fff!important}
+body.alto-contrasto::before,body.alto-contrasto::after{display:none!important}
+body.alto-contrasto :is(.canale,.colonna,.btn,.ctrl,.btn-emerg,.sez-tab,.tab,.box,input,select,textarea,.utente,.toast){background:#000!important;color:#fff!important;border:2px solid #fff!important}
+body.alto-contrasto :is(.btn,.tab.att,.sez-tab.att){background:#b0000f!important}
+body.alto-contrasto :is(.nota,small,.meta){color:#fff!important;opacity:1!important}
+.riga-tasto{display:flex;align-items:center;gap:8px;margin:5px 0}
+.riga-tasto>span{flex:1}
+.riga-tasto .btn.picc:first-of-type{min-width:150px}
+.pannello-app h3{margin:14px 0 4px;font-family:var(--oswald);letter-spacing:1px}
+</style>
+</head>
+<body>
+<div id="annuncio" class="sr-solo" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="annuncio-urg" class="sr-solo" role="alert" aria-live="assertive" aria-atomic="true"></div>
+<div id="sfondo"></div>
+
+<!-- ============ ACCESSO ============ -->
+<section id="scr-accesso" class="schermo" hidden>
+  <div class="box">
+    <div class="box-testa"><h1>RADIO INTERNA</h1><p>SISTEMA RADIO DEL SERVER ROLEPLAY</p></div>
+    <div class="box-tabs">
+      <button class="att" data-modo="login">ACCEDI</button>
+      <button data-modo="reg">RICHIEDI ACCESSO</button>
+      <button data-modo="staff">ACCESSO STAFF</button>
+    </div>
+    <form id="f-login">
+      <label>Nome utente (staff: nome del personaggio)</label><input name="username" autocomplete="username" required>
+      <label>Password</label><input name="password" type="password" autocomplete="current-password" required>
+      <button class="btn">ACCEDI</button>
+    </form>
+    <form id="f-staff" hidden>
+      <label>Nome e cognome del personaggio</label><input name="nome" placeholder="es. Matteo Andolfi" required>
+      <label>Password staff</label><input name="password" type="password" autocomplete="off" required>
+      <button class="btn">ENTRA COME STAFF</button>
+      <div class="nota">Al primo accesso viene creato il tuo account staff; le volte dopo usa lo stesso nome.</div>
+    </form>
+    <form id="f-reg" hidden>
+      <label>Nome utente (per accedere)</label><input name="username" autocomplete="username" required>
+      <label>Password</label><input name="password" type="password" autocomplete="new-password" minlength="6" required>
+      <label>Nome e cognome del personaggio</label><input name="nome" placeholder="es. Davide Ferrara" required>
+      <label>Nome utente Roblox</label><input name="roblox" maxlength="40" placeholder="es. MarcoRP_2009">
+      <label>Matricola / ID (facoltativo)</label><input name="matricola" placeholder="es. 0000">
+      <label>Reparto richiesto</label><select name="categoriaRichiesta" id="sel-reparto"></select>
+      <label>Motivazione (facoltativo)</label><textarea name="motivazione" rows="2" maxlength="300"></textarea>
+      <button class="btn">INVIA RICHIESTA</button>
+      <div class="nota">L’amministrazione controlla la richiesta e ti assegna reparto e grado.</div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ IN ATTESA / RIFIUTATO ============ -->
+<section id="scr-attesa" class="schermo" hidden>
+  <div class="box">
+    <div class="box-testa"><h1 id="attesa-tit">RICHIESTA INVIATA</h1><p id="attesa-sub"></p></div>
+    <div class="corpo" id="attesa-corpo"></div>
+  </div>
+</section>
+
+<!-- ============ APPLICAZIONE ============ -->
+<section id="scr-app" class="schermo" hidden>
+  <nav class="tabs">
+    <button class="tab att" data-vista="radio">RADIO</button>
+    <button class="tab" data-vista="admin" id="tab-admin" hidden>AMMINISTRAZIONE</button>
+    <span class="spazio"></span>
+    <button class="btn-panico" id="btn-panico" title="Tieni premuto: scrivi motivo e posizione e l'allarme arriva a tutti"><i></i>🚨 PANICO</button>
+    <button class="chi" id="chi" title="Il mio account"></button>
+  </nav>
+  <header class="barra-titolo">
+    <h1>RADIO INTERNA</h1>
+    <div class="pillola off" id="pillola"><small>NON CONNESSO</small><span>—</span></div>
+    <div class="dx"><div class="selezione-stato" id="sel-stato">
+      <button data-stato="online"><i class="pallino"></i>Online</button>
+      <button data-stato="inattivo"><i class="pallino st-inattivo"></i>Inattivo</button>
+      <button data-stato="offline"><i class="pallino st-offline"></i>Offline</button>
+    </div></div>
+  </header>
+  <div class="emergenze" id="emergenze"></div>
+  <div id="connessione" hidden>Connessione al server persa: sto riprovando…</div>
+  <div id="chiamate"></div>
+  <div class="centro">
+    <main id="vista-radio" class="vista-radio"><nav id="sezioni" class="sezioni"></nav><div id="griglia" class="griglia"></div></main>
+    <main id="vista-admin" hidden></main>
+    <aside id="pannello-msg">
+      <div class="pm-testa">MESSAGGI RADIO <span id="pm-canale" style="opacity:.8;font-size:13px"></span><span class="spazio"></span><button id="pm-chiudi" title="Chiudi" aria-label="Chiudi il pannello messaggi">×</button></div>
+      <div id="pm-lista"></div>
+      <div class="pm-codici" id="pm-codici"></div>
+      <form id="pm-form"><input id="pm-testo" maxlength="200" placeholder="Scrivi in radio…" autocomplete="off"><button class="btn picc">INVIA</button></form>
+    </aside>
+  </div>
+  <div id="radio-tel" hidden>
+    <div class="rt-testa"><div class="rt-cat" id="rt-cat"></div><div class="rt-nome" id="rt-nome"></div><div class="rt-parla" id="rt-parla"></div></div>
+    <button id="tel-ptt">TIENI PREMUTO<br>PER PARLARE</button>
+    <div class="rt-basso"><button id="rt-mic"></button><button id="rt-sb">🔊 Soundboard</button><button id="rt-panico" style="background:#a3121e;border-color:#ff6b74">🚨 Panico</button><button id="rt-modo"></button><button id="rt-esci">✕ Chiudi</button></div>
+  </div>
+  <footer class="controlli">
+    <button class="ctrl" id="btn-mic" title="Muta / riattiva il microfono"></button>
+    <button class="ctrl" id="btn-cuffie" title="Muta / riattiva l'audio"></button>
+    <button class="ptt-grande" id="btn-ptt" title="Tieni premuto per parlare">🎙 TIENI PREMUTO PER PARLARE</button>
+    <span id="ind-tx"></span>
+    <button class="ctrl" id="btn-lascia">⏏ Lascia radio</button>
+    <button class="ctrl" id="btn-sb" title="Suoni che sentono tutti nella tua radio">🔊 Soundboard</button>
+    <button class="ctrl" id="btn-tel" title="Schermata a tutto schermo con un pulsante grande: usa il telefono come radio mentre giochi">📱 Modalità radio</button>
+    <span class="spazio"></span>
+    <button class="ctrl" id="btn-msg">💬 Messaggi <span class="badge" id="badge-msg" hidden></span></button>
+    <button class="ctrl" id="btn-impostazioni">⚙ Audio</button>
+    <button class="ctrl" id="btn-esci">⎋ Esci</button>
+  </footer>
+</section>
+
+<div id="menu-ctx" hidden></div>
+<div id="modale" hidden></div>
+<div id="allarme" hidden></div>
+<div id="panico-form" hidden></div>
+<div id="soundboard" hidden></div>
+<div id="toasts"></div>
+<div id="sblocca-audio" hidden>🔊 Clicca qui per attivare l’audio</div>
+
+<!-- Elaborazione audio in tempo reale (AudioWorklet): cattura + compressione e riproduzione con buffer -->
+<script type="text/plain" id="codice-worklet">
+// =====================================================================
+//  Elaborazione audio in tempo reale (gira in un thread dedicato del browser, non si blocca mai)
+//  · Cattura:   microfono → 16 kHz (filtro che evita l'aliasing) → compressione ADPCM → un pacchetto ogni 20 ms
+//  · Riproduci: pacchetti ricevuti → decodifica → buffer che si adatta alla rete → altoparlanti
+// =====================================================================
+const PASSI = [7,8,9,10,11,12,13,14,16,17,19,21,23,25,28,31,34,37,41,45,50,55,60,66,73,80,88,97,107,118,130,143,157,173,190,209,230,253,279,307,337,371,408,449,494,544,598,658,724,796,876,963,1060,1166,1282,1411,1552,1707,1878,2066,2272,2499,2749,3024,3327,3660,4026,4428,4871,5358,5894,6484,7132,7845,8630,9493,10442,11487,12635,13899,15289,16818,18500,20350,22385,24623,27086,29794,32767];
+const INDICI = [-1,-1,-1,-1,2,4,6,8,-1,-1,-1,-1,2,4,6,8];
+const N = 320;                  // campioni per pacchetto: 20 ms a 16 kHz
+const FS = 16000;               // frequenza della voce trasmessa
+const INT = 5;                  // byte davanti a ogni pacchetto ricevuto: tipo (1), numero di chi parla (2), sequenza (2)
+const DIM = INT + 4 + N / 2;    // dimensione totale di un pacchetto ricevuto: 169 byte
+const K = 32, FASI = 64;        // filtro di conversione: mezza larghezza e precisione
+
+// ---------------------------------------------------------------------
+class Cattura extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.rapporto = sampleRate / FS;
+    // filtro "sinc" con finestra di Kaiser, taglio a 7 kHz: porta la voce a 16 kHz senza rumori metallici
+    const fc = Math.min(0.5, 7000 / sampleRate), beta = 5;
+    const bessel = x => { let s = 1, t = 1; for (let k = 1; k < 40; k++) { t *= (x / (2 * k)) * (x / (2 * k)); s += t; } return s; };
+    this.tab = new Float32Array(2 * K * FASI + 1);
+    for (let j = 0; j < this.tab.length; j++) {
+      const d = j / FASI - K, a = 2 * Math.PI * fc * d, r = d / K;
+      this.tab[j] = 2 * fc * (d === 0 ? 1 : Math.sin(a) / a) * bessel(beta * Math.sqrt(Math.max(0, 1 - r * r))) / bessel(beta);
+    }
+    this.x = new Float32Array(4096); this.nx = K; this.t = K;      // ultimi campioni ricevuti dal microfono
+    this.buf = new Int16Array(N); this.n = 0; this.energia = 0; this.pred = 0; this.indice = 0;
+  }
+  spingi(x) {
+    if (x > 1) x = 1; else if (x < -1) x = -1;
+    this.energia += x * x;
+    this.buf[this.n++] = x * 32767;
+    if (this.n < N) return;
+    const out = new Uint8Array(4 + N / 2);
+    out[0] = this.pred & 255; out[1] = (this.pred >> 8) & 255; out[2] = this.indice;
+    let pred = this.pred, ind = this.indice;
+    for (let i = 0; i < N; i++) {
+      let diff = this.buf[i] - pred, nib = 0;
+      if (diff < 0) { nib = 8; diff = -diff; }
+      let p = PASSI[ind], delta = p >> 3;
+      if (diff >= p) { nib |= 4; diff -= p; delta += p; }
+      p >>= 1;
+      if (diff >= p) { nib |= 2; diff -= p; delta += p; }
+      p >>= 1;
+      if (diff >= p) { nib |= 1; delta += p; }
+      pred += (nib & 8) ? -delta : delta;
+      if (pred > 32767) pred = 32767; else if (pred < -32768) pred = -32768;
+      ind += INDICI[nib]; if (ind < 0) ind = 0; else if (ind > 88) ind = 88;
+      if (i & 1) out[4 + (i >> 1)] |= nib << 4; else out[4 + (i >> 1)] = nib;
+    }
+    this.pred = pred; this.indice = ind;
+    this.port.postMessage({ rms: Math.sqrt(this.energia / N), dati: out.buffer }, [out.buffer]);
+    this.n = 0; this.energia = 0;
+  }
+  compatta() {
+    const via = Math.floor(this.t) - K;
+    if (via > 0) { this.x.copyWithin(0, via, this.nx); this.nx -= via; this.t -= via; }
+  }
+  process(ingressi) {
+    const ch = ingressi[0] && ingressi[0][0];
+    if (!ch || !ch.length) return true;
+    if (this.nx + ch.length > this.x.length) this.compatta();
+    this.x.set(ch, this.nx); this.nx += ch.length;
+    const x = this.x, tab = this.tab;
+    while (Math.floor(this.t) + K < this.nx) {
+      const i0 = Math.floor(this.t), fj = Math.round((this.t - i0) * FASI);
+      let somma = 0;
+      for (let m = -K + 1; m <= K; m++) somma += x[i0 + m] * tab[(m + K) * FASI - fj];
+      this.spingi(somma);
+      this.t += this.rapporto;
+    }
+    this.compatta();
+    return true;
+  }
+}
+
+// ---------------------------------------------------------------------
+//  Riproduzione. Idee principali:
+//  1. i pacchetti hanno un numero d'ordine: se ne manca uno, al suo posto si mette una copia sfumata dell'ultimo suono
+//  2. il ritardo di ascolto (buffer) si adatta da solo: più la rete è irregolare, più è grande; poi torna a ridursi
+//  3. se il buffer si riempie troppo o troppo poco, la velocità cambia di pochi punti percentuali (non si sente)
+//     invece di tagliare l'audio; se la scheda audio ha un orologio un po' diverso, si compensa allo stesso modo
+//  4. inizio e fine di ogni suono sono sfumati di pochi millisecondi: niente "click"
+// ---------------------------------------------------------------------
+class Riproduci extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.dim = 32768; this.q = new Float32Array(this.dim);       // circa 2 secondi di audio a 16 kHz
+    this.passo = FS / sampleRate; this.vivo = true;
+    this.picco = 0.02; this.extra = 0; this.bersaglio = 0.08;    // ritardo desiderato, in secondi
+    this.stat = { vuoti: 0, persi: 0, scartati: 0 }; this.diag = false; this.contaDiag = 0;
+    this.ultimoArrivo = -1e9; this.suona = false; this.w = 0; this.r = 0; this.f = 1; this.rampa = 0;
+    this.inizia();
+    this.port.onmessage = e => {
+      const d = e.data;
+      if (d === 'stop') this.vivo = false;
+      else if (d === 'fine') this.fine = true;                    // chi parlava ha smesso: i pacchetti successivi sono un nuovo intervento
+      else if (d && d.diag !== undefined) this.diag = !!d.diag;
+      else this.ricevi(new Uint8Array(d));
+    };
+  }
+  inizia() {
+    this.atteso = -1; this.idx = 0; this.minTr = Infinity; this.fine = false; this.vuotoDa = -1; this.dopoVuoto = false;
+    // se c'è ancora audio da riprodurre (ha riparlato subito) non lo si taglia
+    if (!this.suona || this.w - this.r < 2) { this.w = 0; this.r = 0; this.suona = false; this.rampa = 0; this.f = 1; }
+  }
+  ricevi(b) {
+    if (b.length !== DIM || b[0] !== 1) return;
+    const seq = (b[3] << 8) | b[4], ora = currentFrame;
+    let nuovo = this.atteso < 0 || this.fine || ora - this.ultimoArrivo > sampleRate * 0.6, diff = 0;
+    if (!nuovo) {
+      diff = (seq - this.atteso) & 0xffff;
+      if (diff > 0x8000) diff -= 0x10000;
+      if (diff < 0) { this.stat.scartati++; return; }             // arrivato troppo tardi (o doppio): si scarta
+      if (diff > 30) nuovo = true;                                // manca quasi mezzo secondo: si riparte da capo
+    }
+    if (nuovo) { this.inizia(); diff = 0; }
+    else if (this.vuotoDa >= 0) {                                 // il buffer era vuoto in attesa di questo pacchetto: la rete è lenta
+      this.extra = Math.min(0.12, this.extra + 0.02); this.stat.vuoti++; this.vuotoDa = -1;
+    }
+    this.ultimoArrivo = ora;
+    // quanto è in ritardo questo pacchetto rispetto al migliore visto finora? Da qui si decide la grandezza del buffer
+    this.idx = nuovo ? 0 : this.idx + 1 + diff;
+    const tr = ora / sampleRate - this.idx * 0.02;
+    if (tr < this.minTr) this.minTr = tr;
+    this.picco = Math.max(Math.min(tr - this.minTr, 0.25), this.picco * 0.985);
+    this.extra *= 0.997;
+    this.bersaglio = Math.min(0.3, Math.max(0.07, 0.05 + 1.1 * this.picco + this.extra));
+    for (let k = 0; k < diff; k++) { this.nascondi(); this.stat.persi++; }
+    this.decodifica(b, INT);
+    this.atteso = (seq + 1) & 0xffff;
+  }
+  nascondi() {          // pacchetto perso: si ripete l'ultimo suono più piano (dopo qualche pacchetto diventa silenzio)
+    for (let i = 0; i < N; i++) {
+      this.q[this.w % this.dim] = this.w >= N ? this.q[(this.w - N) % this.dim] * 0.7 : 0;
+      this.w++;
+    }
+  }
+  decodifica(b, o) {
+    let pred = b[o] | (b[o + 1] << 8); if (pred & 0x8000) pred -= 0x10000;
+    let ind = Math.min(88, b[o + 2]);
+    for (let i = 0; i < N; i++) {
+      const byte = b[o + 4 + (i >> 1)], nib = (i & 1) ? (byte >> 4) : (byte & 15);
+      const p = PASSI[ind];
+      let delta = p >> 3;
+      if (nib & 4) delta += p;
+      if (nib & 2) delta += p >> 1;
+      if (nib & 1) delta += p >> 2;
+      pred += (nib & 8) ? -delta : delta;
+      if (pred > 32767) pred = 32767; else if (pred < -32768) pred = -32768;
+      ind += INDICI[nib]; if (ind < 0) ind = 0; else if (ind > 88) ind = 88;
+      this.q[this.w % this.dim] = pred / 32768;
+      this.w++;
+    }
+  }
+  process(_, uscite) {
+    if (!this.vivo) return false;
+    const out = uscite[0][0], L = out.length;
+    if (!this.suona) {
+      // si parte quando il buffer è abbastanza pieno (o se chi parlava ha già finito / non arriva altro)
+      const pieno = (this.w - this.r) >= this.bersaglio * FS * (this.dopoVuoto ? 0.5 : 1);
+      if (this.w > 0 && (pieno || this.fine || currentFrame - this.ultimoArrivo > sampleRate * 0.25)) { this.suona = true; this.rampa = 0; this.dopoVuoto = false; }
+      else { out.fill(0); return true; }
+    }
+    const liv = (this.w - this.r) / FS, err = liv - this.bersaglio;
+    let voglio = 1;
+    if (err > 0.05) voglio = 1 + Math.min(0.08, (err - 0.05) * 0.25);              // troppo pieno: un filo più veloce
+    else if (err < -0.04) voglio = 1 - Math.min(0.03, (-err - 0.04) * 0.25);       // troppo vuoto: un filo più lento
+    this.f += (voglio - this.f) * 0.03;
+    if (liv > 0.9) this.r = this.w - this.bersaglio * FS;                          // ritardo eccessivo (caso raro): si recupera
+    const passo = this.passo * this.f;
+    for (let i = 0; i < L; i++) {
+      const disp = this.w - this.r;
+      if (disp < 2) {                                                              // buffer finito
+        this.suona = false;
+        if (!this.fine) { this.vuotoDa = currentFrame + i; this.dopoVuoto = true; }                           // sta aspettando altri pacchetti
+        out.fill(0, i); break;
+      }
+      const k = Math.floor(this.r), fr = this.r - k;
+      const a = this.q[k % this.dim], c = this.q[(k + 1) % this.dim];
+      let g = 1;
+      if (this.rampa < 96) { g = this.rampa / 96; this.rampa++; }                  // entrata dolce
+      if (disp < 96) g = Math.min(g, disp / 96);                                   // uscita dolce
+      out[i] = (a + (c - a) * fr) * g;
+      this.r += passo;
+    }
+    if (this.diag && ++this.contaDiag >= 375) {
+      this.contaDiag = 0;
+      this.port.postMessage({ liv, bers: this.bersaglio, vuoti: this.stat.vuoti, persi: this.stat.persi, scartati: this.stat.scartati });
+    }
+    return true;
+  }
+}
+registerProcessor('radio-cattura', Cattura);
+registerProcessor('radio-riproduci', Riproduci);
+</script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+'use strict';
+// =====================================================================
+//  RADIO INTERNA v2 — client
+// =====================================================================
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const IC = {
+  utente: '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>',
+  mic: '<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11h-2z"/></svg>',
+  micOff: '<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11h-2z"/><path d="M4 3l17 17" stroke="currentColor" stroke-width="2.4"/></svg>',
+  cuffie: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9v6a3 3 0 0 0 3 3h2v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h2a3 3 0 0 0 3-3v-6a9 9 0 0 0-9-9z"/></svg>',
+  cuffieOff: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9v6a3 3 0 0 0 3 3h2v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h2a3 3 0 0 0 3-3v-6a9 9 0 0 0-9-9z"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2.4"/></svg>',
+  chev: '<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>',
+  onde: '<svg viewBox="0 0 24 24"><path d="M12 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-4.2-2.6 1.4 1.4a4 4 0 0 0 0 6.4l-1.4 1.4a6 6 0 0 1 0-9.2zm8.4 0a6 6 0 0 1 0 9.2l-1.4-1.4a4 4 0 0 0 0-6.4zM5 4.6 6.4 6a8 8 0 0 0 0 12L5 19.4a10 10 0 0 1 0-14.8zm14 0a10 10 0 0 1 0 14.8L17.6 18a8 8 0 0 0 0-12z"/></svg>',
+};
+const CODICI_RAPIDI = ['Ricevuto', 'In arrivo', 'Sul posto', 'Richiedo supporto', 'Libero', 'Occupato', 'Codice rosso'];
+
+function toast(msg, tipo) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (tipo === 'err' ? ' err' : '');
+  if (tipo === 'err') suono('errore');
+  t.textContent = msg;
+  annuncia(msg, tipo === 'err');
+  $('#toasts').appendChild(t);
+  setTimeout(() => t.remove(), 4500);
+}
+
+// ---------------- stato ----------------
+let token = localStorage.getItem('radio_token');
+let socket = null, io_ = null, config = { gruppi: {}, maxAscolto: 2 };
+let S = { sezioni: [], categorie: [], radio: [], online: [], utenti: [], gruppi: {} };
+let sezioneVista = localStorage.getItem('radio_sezione') || '';
+let vista = 'radio', sezioneAdmin = 'richieste', filtroUtenti = '', adminPendente = false, registro = [], registroCaricato = false;
+let micMutato = false, cuffieMutate = false, micPrimaCuffie = false, statoUtente = 'online', statoAuto = false;
+let ultimaRadio = null, msgs = [], nonLetti = 0, pannelloAperto = innerWidth > 1000;
+const parlanti = new Set();
+const collassati = new Set(JSON.parse(localStorage.getItem('radio_collassati') || '[]'));
+const imp = Object.assign({
+  microfono: '', uscita: '', sensibilita: 65, modo: 'voce', tastoPtt: 'KeyV', effettoRadio: true,
+  volumeGenerale: 1, volumi: {}, riduzioneEco: false, suoni: true, notifiche: !!window.appRadio, altoContrasto: false, scala: 0, annunciaParlanti: false,
+}, JSON.parse(localStorage.getItem('radio_impostazioni') || '{}'));
+const salvaImp = () => localStorage.setItem('radio_impostazioni', JSON.stringify(imp));
+
+const eStaff = u => !!u && (u.ruolo === 'admin' || u.ruolo === 'staff');
+const mioStato = () => io_ && S.online.find(u => u.id === io_.id);
+const cat = id => S.categorie.find(c => c.id === id);
+const radioDi = id => S.radio.find(r => r.id === id);
+// sezioni (FF.OO, SOCCORSO…): le categorie senza sezione finiscono in "ALTRE"
+const sezioneDi = c => (c && (S.sezioni || []).some(x => x.id === c.sezioneId) ? c.sezioneId : 'altre');
+function elencoSezioni(conTutte) {
+  const l = (S.sezioni || []).map(x => ({ id: x.id, nome: x.nome, colore: x.colore, cats: S.categorie.filter(c => c.sezioneId === x.id) }));
+  const altre = S.categorie.filter(c => sezioneDi(c) === 'altre');
+  if (altre.length) l.push({ id: 'altre', nome: 'ALTRE', colore: '#6b6b70', cats: altre });
+  if (conTutte && l.length > 1) l.push({ id: 'tutte', nome: 'TUTTE', colore: '#8a8a90', cats: S.categorie });
+  return l;
+}
+const gruppoUtente = u => { const c = u && cat(u.categoriaId); return c ? c.gruppo : null; };
+
+// =====================================================================
+//  ACCESSO E REGISTRAZIONE
+// =====================================================================
+async function api(url, body) {
+  if (location.protocol === 'file:') throw new Error('Non aprire index.html con doppio clic: avvia il server e vai su http://localhost:3000');
+  let r;
+  try { r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); }
+  catch { throw new Error('Il server non risponde: controlla che sia acceso'); }
+  const j = await r.json().catch(() => null);
+  if (!j) throw new Error('Il server in esecuzione è una versione vecchia: chiudilo e riavvialo con i file nuovi');
+  if (!r.ok) throw new Error(j.errore || 'Errore');
+  return j;
+}
+async function caricaReparti(sel, scelto) {
+  const lista = await fetch('/api/categorie').then(r => r.json()).catch(() => []);
+  const perSezione = new Map();
+  for (const c of lista) { const k = c.sezione || 'ALTRE'; if (!perSezione.has(k)) perSezione.set(k, []); perSezione.get(k).push(c); }
+  sel.innerHTML = '<option value="">— Nessuno / cittadino —</option>' + [...perSezione].map(([k, cs]) =>
+    `<optgroup label="${esc(k)}">${cs.map(c => `<option value="${c.id}" ${c.id === scelto ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</optgroup>`).join('');
+}
+document.querySelectorAll('.box-tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.box-tabs button').forEach(x => x.classList.toggle('att', x === b));
+  $('#f-login').hidden = b.dataset.modo !== 'login';
+  $('#f-reg').hidden = b.dataset.modo !== 'reg';
+  $('#f-staff').hidden = b.dataset.modo !== 'staff';
+});
+for (const [id, url] of [['#f-login', '/api/accedi'], ['#f-reg', '/api/registrati'], ['#f-staff', '/api/accesso-staff']]) {
+  $(id).onsubmit = async e => {
+    e.preventDefault();
+    const b = e.target.querySelector('button');
+    b.disabled = true;
+    try { const r = await api(url, Object.fromEntries(new FormData(e.target))); avviaSessione(r.token); }
+    catch (err) { toast(err.message, 'err'); }
+    b.disabled = false;
+  };
+}
+function avviaSessione(t) {
+  token = t;
+  localStorage.setItem('radio_token', t);
+  sbloccaAudio();
+  connetti();
+}
+async function esci(soloLocale) {
+  if (!soloLocale && token) await api('/api/esci', { token }).catch(() => {});
+  token = null;
+  localStorage.removeItem('radio_token');
+  if (socket) { socket.removeAllListeners(); socket.disconnect(); socket = null; }
+  fermaRiproduttori();
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  io_ = null;
+  mostra('accesso');
+}
+function mostra(schermo) {
+  for (const s of ['accesso', 'attesa', 'app']) $('#scr-' + s).hidden = s !== schermo;
+  if (schermo === 'accesso') caricaReparti($('#sel-reparto'));
+}
+
+// =====================================================================
+//  CONNESSIONE AL SERVER
+// =====================================================================
+function connetti() {
+  if (socket) { socket.removeAllListeners(); socket.disconnect(); }
+  socket = io({ auth: { token }, transports: ['websocket', 'polling'], reconnectionDelayMax: 3000 });
+  socket.on('connect_error', e => {
+    if (e.message === 'non_autorizzato') { toast('Sessione scaduta, accedi di nuovo', 'err'); esci(true); }
+    else $('#connessione').hidden = false;
+  });
+  socket.on('connect', () => {
+    $('#connessione').hidden = true;
+    socket.emit('audio', { micMutato, cuffieMutate });
+    socket.emit('stato-utente', { stato: statoUtente });
+    if (ultimaRadio) socket.emit('entra', { radioId: ultimaRadio }, r => r && r.messaggi && unisciMessaggi(r.messaggi));
+  });
+  socket.on('disconnect', motivo => {
+    parlanti.clear();
+    fermaRiproduttori();
+    if (motivo !== 'io client disconnect') $('#connessione').hidden = false;
+  });
+  socket.on('config', c => { config = c; });
+  socket.on('io', u => { const prima = io_ && io_.stato; io_ = u; aggiornaSchermo(prima); });
+  socket.on('stato', d => { S = d; render(); });
+  socket.on('v', (n, seq, dati) => riceviVoce(n, seq, dati));
+  socket.on('parla', ({ id, on }) => cambioParla(id, on));
+  socket.on('messaggio', m => { unisciMessaggi([m]); if (m.da !== (io_ && io_.id) && !pannelloAperto) { nonLetti++; aggiornaBadgeMsg(); } suono('msg');
+    if (APP && !m.sistema && m.da !== (io_ && io_.id)) notifica('💬 ' + (m.nome || 'Messaggio radio'), String(m.testo || '')); });
+  socket.on('panico', mostraPanico);
+  socket.on('soundboard', riceviSoundboard);
+  socket.on('registro', voce => { registro.unshift(voce); if (vista === 'admin' && sezioneAdmin === 'registro') renderAdmin(); });
+  socket.on('avviso', m => toast(m));
+  socket.on('spostato', d => { ultimaRadio = d.radioId; if (d.messaggi) unisciMessaggi(d.messaggi); suono(d.radioId ? 'entra' : 'esci'); });
+  socket.on('sostituito', () => { socket.removeAllListeners(); fermaRiproduttori(); token = null; io_ = null; mostra('accesso'); });
+  socket.on('espulso', () => { socket.removeAllListeners(); fermaRiproduttori(); io_ = null; mostra('accesso'); toast('Sei stato disconnesso dallo staff', 'err'); });
+  socket.on('esci', () => esci(true));
+}
+
+function aggiornaSchermo(statoPrima) {
+  if (!io_) return;
+  if (io_.stato === 'approvato') {
+    if (statoPrima && statoPrima !== 'approvato') toast('Accesso approvato: benvenuto in radio!');
+    mostra('app');
+    $('#tab-admin').hidden = !eStaff(io_);
+    if (!eStaff(io_) && vista === 'admin') cambiaVista('radio');
+    preparaAudio();
+    return;
+  }
+  fermaRiproduttori();
+  mostra('attesa');
+  const rif = io_.stato === 'rifiutato';
+  $('#attesa-tit').textContent = rif ? 'ACCESSO NON CONCESSO' : 'RICHIESTA INVIATA';
+  $('#attesa-sub').textContent = rif ? 'L’AMMINISTRAZIONE HA RIFIUTATO O SOSPESO L’ACCOUNT' : 'IN ATTESA DELL’AMMINISTRAZIONE';
+  $('#attesa-corpo').innerHTML = `
+    <div class="meta">Personaggio: <b>${esc(io_.nome)}</b>${io_.matricola ? ` (${esc(io_.matricola)})` : ''}<br>Utente: <b>${esc(io_.username)}</b></div>
+    ${rif ? `<label>Reparto richiesto</label><select id="nr-reparto"></select>
+             <label>Motivazione</label><textarea id="nr-mot" rows="2" maxlength="300"></textarea>
+             <button class="btn" id="nr-invia">INVIA UNA NUOVA RICHIESTA</button>`
+          : '<div class="nota">Questa pagina si aggiorna da sola appena la richiesta viene accettata.</div>'}
+    <button class="btn sec" id="attesa-esci">ESCI</button>`;
+  $('#attesa-esci').onclick = () => esci();
+  if (rif) {
+    caricaReparti($('#nr-reparto'), io_.categoriaRichiesta);
+    $('#nr-invia').onclick = () => socket.emit('nuova-richiesta', { categoriaRichiesta: $('#nr-reparto').value, motivazione: $('#nr-mot').value },
+      r => r && r.errore ? toast(r.errore, 'err') : toast('Richiesta inviata'));
+  }
+}
+
+// =====================================================================
+//  MOTORE AUDIO
+//  microfono → filtri → AudioWorklet (16 kHz + ADPCM) → server
+//  server → AudioWorklet con buffer → volume utente → effetto radio → uscita
+// =====================================================================
+let ctx = null, master = null, pronto = null, micStream = null, micSource = null, catturaNode = null, filtriMic = null;
+let elUscita = null, loopback = null;
+const riproduttori = new Map();     // numero utente → nodi di riproduzione
+const stat = { inviati: 0, ricevuti: 0, perNumero: {}, uscita: '' };   // contatori (utili per controllare che la voce passi)
+window.__radio = { stat, riproduttori };
+
+function sbloccaAudio() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'playback' });
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  if (elUscita && elUscita.paused) elUscita.play().catch(() => {});
+  setTimeout(aggiornaBannerAudio, 300);
+}
+function aggiornaBannerAudio() {
+  const bloccato = !ctx || ctx.state !== 'running' || (elUscita && elUscita.paused);
+  $('#sblocca-audio').hidden = !(bloccato && io_ && io_.stato === 'approvato');
+}
+document.addEventListener('pointerdown', sbloccaAudio);
+$('#sblocca-audio').onclick = sbloccaAudio;
+
+function preparaAudio() {
+  if (pronto) return pronto;
+  pronto = (async () => {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'playback' });
+    const url = URL.createObjectURL(new Blob([$('#codice-worklet').textContent], { type: 'application/javascript' }));
+    await ctx.audioWorklet.addModule(url);
+    master = ctx.createGain();
+    aggiornaMaster();
+    await collegaUscita();
+    aggiornaBannerAudio();
+  })().catch(e => { console.error(e); toast('Questo browser non supporta l’audio della radio: usa Chrome, Edge o Firefox aggiornati', 'err'); });
+  return pronto;
+}
+function aggiornaMaster() { if (master) master.gain.value = cuffieMutate ? 0 : imp.volumeGenerale; }
+
+// Uscita audio. Con "Riduzione eco" il suono passa da un piccolo collegamento WebRTC
+// interno al browser: così la cancellazione dell'eco del microfono lo riconosce
+// e chi usa le casse non rimanda la voce degli altri in radio.
+async function collegaUscita() {
+  try { master.disconnect(); } catch {}
+  if (loopback) { loopback.forEach(pc => pc.close()); loopback = null; }
+  if (elUscita) { elUscita.pause(); elUscita.srcObject = null; elUscita = null; }
+  if (imp.riduzioneEco && window.RTCPeerConnection) {
+    try { await attivaLoopback(); stat.uscita = 'riduzione-eco'; return; } catch (e) { console.warn('Riduzione eco non disponibile:', e); }
+  }
+  master.connect(ctx.destination);
+  stat.uscita = 'diretta';
+}
+async function attivaLoopback() {
+  const dest = ctx.createMediaStreamDestination();
+  const a = new RTCPeerConnection(), b = new RTCPeerConnection();
+  loopback = [a, b];
+  a.onicecandidate = e => e.candidate && b.addIceCandidate(e.candidate).catch(() => {});
+  b.onicecandidate = e => e.candidate && a.addIceCandidate(e.candidate).catch(() => {});
+  const el = new Audio();
+  el.autoplay = true;
+  const traccia = new Promise(ok => { b.ontrack = e => { el.srcObject = e.streams[0] || new MediaStream([e.track]); ok(); }; });
+  dest.stream.getTracks().forEach(t => a.addTrack(t, dest.stream));
+  await a.setLocalDescription(await a.createOffer());
+  await b.setRemoteDescription(a.localDescription);
+  await b.setLocalDescription(await b.createAnswer());
+  await a.setRemoteDescription(b.localDescription);
+  const connesso = new Promise((ok, no) => {
+    const t = setTimeout(() => no(new Error('timeout')), 4000);
+    const prova = () => { if (a.connectionState === 'connected' || a.iceConnectionState === 'connected' || a.iceConnectionState === 'completed') { clearTimeout(t); ok(); } };
+    a.onconnectionstatechange = prova; a.oniceconnectionstatechange = prova; prova();
+  });
+  await Promise.all([traccia, connesso]);
+  master.connect(dest);
+  elUscita = el;
+  if (imp.uscita && el.setSinkId) await el.setSinkId(imp.uscita).catch(() => {});
+  el.play().catch(() => {});
+}
+
+// --- microfono ---
+async function assicuraMic() {
+  sbloccaAudio();
+  await preparaAudio();
+  if (micStream && micStream.active) return true;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    toast('Il microfono funziona solo con il link https (o su localhost): potrai solo ascoltare', 'err');
+    return false;
+  }
+  const vincoli = id => ({ audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: true, noiseSuppression: true, autoGainControl: false, channelCount: 1 } });
+  try {
+    try { micStream = await navigator.mediaDevices.getUserMedia(vincoli(imp.microfono)); }
+    catch (e) { if (!imp.microfono) throw e; micStream = await navigator.mediaDevices.getUserMedia(vincoli('')); }
+  } catch (e) {
+    toast('Microfono non disponibile o permesso negato: potrai solo ascoltare', 'err');
+    return false;
+  }
+  if (!catturaNode) {
+    catturaNode = new AudioWorkletNode(ctx, 'radio-cattura', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1] });
+    catturaNode.port.onmessage = e => pacchettoMic(e.data);
+    const muto = ctx.createGain();
+    muto.gain.value = 0;
+    catturaNode.connect(muto).connect(ctx.destination);   // tiene attiva l'elaborazione senza farsi sentire
+    // filtro: via i rumori bassi (le alte frequenze le toglie già il worklet quando scende a 16 kHz)
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 90;
+    hp.connect(catturaNode);
+    filtriMic = hp;
+  }
+  if (micSource) micSource.disconnect();
+  micSource = ctx.createMediaStreamSource(micStream);
+  micSource.connect(filtriMic);
+  return true;
+}
+async function cambiaMicrofono(id) {
+  imp.microfono = id; salvaImp();
+  if (!micStream) return;
+  const vecchio = micStream;
+  micStream = null;
+  if (await assicuraMic()) vecchio.getTracks().forEach(t => t.stop());
+}
+
+// --- trasmissione ---
+let pttTasto = false, pttMouse = false, pttGlobale = false;      // pttGlobale = tasto premuto anche fuori dalla finestra (app per computer)
+let ultimaVoce = 0, trasmetto = false, livelloMic = 0;
+const preRoll = [];
+const soglia = () => 0.004 + 0.07 * (1 - imp.sensibilita / 100) ** 2;
+const pttPremuto = () => pttTasto || pttMouse || pttGlobale;
+
+function possoTrasmettere() {
+  const me = mioStato();
+  return !!(me && (me.radioId || me.trasmette) && !micMutato && !cuffieMutate && !me.silenziato && socket && socket.connected);
+}
+let seqTx = 0;
+function invia(dati) {
+  // se la rete è già in ritardo (messaggi in coda) il pacchetto si salta: meglio un piccolo buco che un ritardo che cresce
+  const eng = socket.io && socket.io.engine;
+  if (!eng || !eng.writeBuffer || eng.writeBuffer.length <= 8) { socket.emit('v', seqTx, dati); stat.inviati++; }
+  seqTx = (seqTx + 1) & 0xffff;
+}
+function pacchettoMic({ rms, dati }) {
+  livelloMic = rms;
+  const adesso = performance.now();
+  if (rms > soglia()) ultimaVoce = adesso;
+  const attivo = pttPremuto() || (imp.modo === 'voce' && adesso - ultimaVoce < 600);
+  if (possoTrasmettere() && attivo) {
+    if (!trasmetto) {
+      trasmetto = true;
+      if (imp.modo === 'voce') for (const p of preRoll) invia(p);
+      preRoll.length = 0;
+      aggiornaControlli();
+      cambioParla(io_.id, true, true);
+    }
+    invia(dati);
+  } else {
+    if (trasmetto) { trasmetto = false; aggiornaControlli(); cambioParla(io_.id, false, true); }
+    preRoll.push(dati);
+    if (preRoll.length > 10) preRoll.shift();      // 200 ms di anteprima: la prima sillaba non si taglia
+  }
+}
+
+// --- ricezione ---
+function curvaDistorsione(k) {
+  const n = 1024, c = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; c[i] = (3 + k) * x * 20 * Math.PI / 180 / (Math.PI + k * Math.abs(x)); }
+  return c;
+}
+const uidDiNumero = n => { const u = S.online.find(x => x.n === n); return u ? u.id : null; };
+function riceviVoce(n, seq, dati) {
+  if (!ctx || !master || cuffieMutate || !dati) return;
+  let r = riproduttori.get(n);
+  if (!r) {
+    const nodo = new AudioWorkletNode(ctx, 'radio-riproduci', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [1] });
+    const gain = ctx.createGain();
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 300;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3600;
+    const dist = ctx.createWaveShaper(); dist.curve = curvaDistorsione(2); dist.oversample = '2x';
+    r = { nodo, gain, hp, lp, dist, ultimo: 0 };
+    collegaEffetto(r);
+    gain.connect(master);
+    riproduttori.set(n, r);
+  }
+  const uid = uidDiNumero(n);
+  r.gain.gain.value = uid ? (imp.volumi[uid] ?? 1) : 1;
+  r.ultimo = performance.now();
+  const p = new Uint8Array(5 + dati.byteLength);       // intestazione di 5 byte + i 164 della voce
+  p[0] = 1; p[1] = n >> 8; p[2] = n & 255; p[3] = seq >> 8; p[4] = seq & 255;
+  p.set(new Uint8Array(dati), 5);
+  r.nodo.port.postMessage(p.buffer, [p.buffer]);
+  stat.ricevuti++;
+  stat.perNumero[n] = (stat.perNumero[n] || 0) + 1;
+}
+function collegaEffetto(r) {
+  [r.nodo, r.hp, r.lp, r.dist].forEach(x => { try { x.disconnect(); } catch {} });
+  if (imp.effettoRadio) { r.nodo.connect(r.hp); r.hp.connect(r.lp); r.lp.connect(r.dist); r.dist.connect(r.gain); }
+  else r.nodo.connect(r.gain);
+}
+function fermaRiproduttori() {
+  for (const r of riproduttori.values()) { r.nodo.port.postMessage('stop'); try { r.nodo.disconnect(); r.gain.disconnect(); } catch {} }
+  riproduttori.clear();
+}
+setInterval(() => {   // libera chi non parla da un po'
+  const adesso = performance.now();
+  for (const [n, r] of riproduttori) if (adesso - r.ultimo > 15000) {
+    r.nodo.port.postMessage('stop');
+    try { r.nodo.disconnect(); r.gain.disconnect(); } catch {}
+    riproduttori.delete(n);
+  }
+}, 5000);
+
+// --- suoni della radio (tutti generati dal browser, nessun file da scaricare) ---
+// una nota: frequenza (o scivolata f→f2), forma d'onda, volume, attacco e decadimento
+function nota(f, t, d, o = {}) {
+  const osc = ctx.createOscillator(), g = ctx.createGain();
+  osc.type = o.onda || 'sine';
+  osc.frequency.setValueAtTime(f, t);
+  if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t + d);
+  if (o.vibrato) {   // vibrato (fischietto)
+    const lfo = ctx.createOscillator(), lg = ctx.createGain();
+    lfo.frequency.value = o.vibrato; lg.gain.value = f * 0.05; lfo.connect(lg); lg.connect(osc.frequency); lfo.start(t); lfo.stop(t + d + .05);
+  }
+  const v = o.vol || .14;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(v, t + (o.att || .01));
+  if (o.campana) g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  else { g.gain.setValueAtTime(v, t + Math.max(o.att || .01, d - .03)); g.gain.exponentialRampToValueAtTime(0.0001, t + d); }
+  let nodo = g;
+  osc.connect(g);
+  if (o.passaBasso) { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = o.passaBasso; g.connect(fl); nodo = fl; }
+  nodo.connect(master);
+  osc.start(t); osc.stop(t + d + .05);
+}
+// sirena bitonale: alterna due toni per la durata indicata
+function sirena(t, f1, f2, periodo, durata, vol = .07) {
+  for (let k = 0; k * periodo < durata; k++) nota(k % 2 ? f2 : f1, t + k * periodo, periodo, { onda: 'sawtooth', vol, passaBasso: 2400, att: .005 });
+}
+const SUONI_SB = [
+  ['chiamata', '📟', 'Chiamata selettiva'], ['roger', '📻', 'Roger beep'], ['ricevuto', '✅', 'Ricevuto'],
+  ['attenzione', '🔔', 'Attenzione centrale'], ['allerta', '⚠️', 'Allerta'], ['radar', '📡', 'Radar'],
+  ['sirena-ps', '🚓', 'Sirena Polizia'], ['sirena-cc', '🚔', 'Sirena Carabinieri'], ['sirena-vvf', '🚒', 'Sirena VVF'],
+  ['sirena-118', '🚑', 'Sirena 118'], ['clacson', '📯', 'Clacson'], ['fischietto', '😙', 'Fischietto'],
+];
+function suono(tipo, forza) {
+  if (!ctx || ctx.state !== 'running' || cuffieMutate || !master) return;
+  if (!imp.suoni && !forza) return;
+  const t = ctx.currentTime + .01;
+  const seq = (lista, o = {}) => { let x = t; for (const [f, d, p = .03] of lista) { if (f) nota(f, x, d, o); x += d + p; } };
+  switch (tipo) {
+    case 'squelch': {   // scatto radio quando qualcuno inizia a parlare
+      if (!imp.effettoRadio) return;
+      const b = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.07), ctx.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      const sorg = ctx.createBufferSource(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+      f.type = 'bandpass'; f.frequency.value = 2200; g.gain.value = 0.16;
+      sorg.buffer = b; sorg.connect(f); f.connect(g); g.connect(master); sorg.start();
+      return;
+    }
+    case 'entra': return seq([[880, .07], [1320, .1]]);
+    case 'esci': return seq([[1320, .07], [880, .1]]);
+    case 'tx': return seq([[1400, .05, .02], [1750, .07]], { vol: .1 });
+    case 'txfine': return seq([[1150, .05, .02], [820, .08]], { vol: .1 });
+    case 'fine': return seq([[1250, .05]], { vol: .1 });
+    case 'msg': return seq([[1500, .05], [1900, .06]], { vol: .1 });
+    case 'codice': return seq([[1700, .04, .02], [1700, .04]], { vol: .1 });
+    case 'micon': return seq([[600, .04, .01], [900, .05]], { vol: .08 });
+    case 'micoff': return seq([[900, .04, .01], [600, .05]], { vol: .08 });
+    case 'ascolta': return seq([[1000, .05, .01], [1300, .05, .01], [1600, .06]], { vol: .08 });
+    case 'errore': return seq([[300, .12, .04], [220, .16]], { onda: 'square', vol: .05, passaBasso: 1500 });
+    case 'utente': return seq([[1900, .04]], { vol: .05 });
+    // prima di parlare a una fazione intera: tono di priorità (3 bip che salgono + nota lunga)
+    case 'comunica': return seq([[880, .09, .05], [1100, .09, .05], [1320, .09, .05], [1760, .35]], { onda: 'triangle', vol: .16 });
+    case 'allerta-gruppo': return seq([[1320, .12, .04], [990, .12, .04], [1320, .12, .04], [990, .2]], { onda: 'triangle', vol: .15 });
+    case 'panicoinvio': return seq([[700, .1, .02], [1000, .1, .02], [1400, .25]], { onda: 'square', vol: .06, passaBasso: 2500 });
+    case 'sirena': sirena(t, 1050, 700, .25, 2.5, .09); return;
+    // soundboard
+    case 'chiamata': return seq([[1060, .07, .005], [1160, .07, .005], [1270, .07, .005], [1400, .07, .005], [1530, .1]], { vol: .13 });
+    case 'roger': return seq([[1200, .05, .005], [1600, .09]], { vol: .13 });
+    case 'ricevuto': return seq([[1000, .08, .08], [1000, .08]], { vol: .14 });
+    case 'attenzione': nota(880, t, 1.1, { campana: true, vol: .2 }); nota(1760, t, .6, { campana: true, vol: .05 });
+      nota(698, t + .45, 1.4, { campana: true, vol: .2 }); nota(1396, t + .45, .8, { campana: true, vol: .05 }); return;
+    case 'allerta': for (let k = 0; k < 14; k++) nota(k % 2 ? 1000 : 780, t + k * .08, .08, { onda: 'square', vol: .05, passaBasso: 2600, att: .003 }); return;
+    case 'radar': for (let k = 0; k < 3; k++) nota(400, t + k * .45, .4, { f2: 1600, vol: .1 }); return;
+    case 'sirena-ps': return sirena(t, 660, 880, .45, 3.1);
+    case 'sirena-cc': return sirena(t, 590, 790, .5, 3);
+    case 'sirena-vvf': return sirena(t, 440, 587, .7, 3.5);
+    case 'sirena-118': return sirena(t, 700, 950, .35, 2.8);
+    case 'clacson': nota(350, t, .55, { onda: 'square', vol: .06, passaBasso: 1200 }); nota(440, t, .55, { onda: 'square', vol: .06, passaBasso: 1200 }); return;
+    case 'fischietto': nota(2800, t, .35, { vibrato: 32, vol: .08 }); nota(2800, t + .45, .6, { vibrato: 32, vol: .08 }); return;
+  }
+}
+
+// chi parla: bordo verde, scatto radio all'inizio e "bip" alla fine
+function sentoUtente(u) {
+  const me = mioStato();
+  if (!u || !me || u.id === me.id) return false;
+  if (u.trasmette) return u.trasmette === gruppoUtente(io_) || u.trasmette === me.trasmette;
+  return !!u.radioId && (u.radioId === me.radioId || me.ascolto.includes(u.radioId));
+}
+function cambioParla(id, on, locale) {
+  // per me stessa uso lo stato locale (più immediato); per gli altri quello del server
+  if (io_ && id === io_.id && !locale) return;
+  const prima = parlanti.has(id);
+  on ? parlanti.add(id) : parlanti.delete(id);
+  if (!on && !locale) { const u = S.online.find(x => x.id === id), r = u && riproduttori.get(u.n); if (r) r.nodo.port.postMessage('fine'); }
+  if (!locale && prima !== on && sentoUtente(S.online.find(x => x.id === id))) suono(on ? 'squelch' : 'fine');
+  if (!locale && on && !prima && imp.annunciaParlanti) { const u = S.online.find(x => x.id === id); if (u && sentoUtente(u)) annuncia(u.nome + ' sta parlando'); }
+  aggiornaParlanti();
+}
+function aggiornaParlanti() {
+  aggiornaTel(); programmaStatoApp();
+  document.querySelectorAll('[data-uid]').forEach(el => el.classList.toggle('parla', parlanti.has(el.dataset.uid)));
+  // pallino verde sulla scheda della sezione dove qualcuno sta parlando
+  const conVoce = new Set();
+  for (const u of S.online) if (parlanti.has(u.id)) { const r = radioDi(u.radioId); if (r) conVoce.add(sezioneDi(cat(r.categoriaId))); }
+  document.querySelectorAll('.sez-tab[data-vsez]').forEach(b => b.classList.toggle('voce', b.dataset.vsez === 'tutte' ? conVoce.size > 0 : conVoce.has(b.dataset.vsez)));
+  $('#pillola').classList.toggle('parlo', !!(io_ && parlanti.has(io_.id)));
+}
+
+// misuratore del microfono nelle impostazioni
+setInterval(() => {
+  const m = $('#misura-mic');
+  if (!m) return;
+  m.style.width = Math.min(100, Math.sqrt(livelloMic) * 260) + '%';
+  $('#soglia-mic').style.left = Math.min(100, Math.sqrt(soglia()) * 260) + '%';
+}, 80);
+
+// =====================================================================
+//  AZIONI DELL'UTENTE
+// =====================================================================
+async function entraRadio(id) {
+  const me = mioStato();
+  if (me && me.radioId === id) return;
+  await assicuraMic();
+  socket.emit('entra', { radioId: id }, r => {
+    if (r && r.errore) return toast(r.errore, 'err');
+    ultimaRadio = id;
+    if (r && r.messaggi) unisciMessaggi(r.messaggi);
+    suono('entra');
+  });
+}
+function lasciaRadio() { socket.emit('entra', { radioId: null }, () => { ultimaRadio = null; suono('esci'); }); }
+function ascoltaRadio(id) {
+  socket.emit('ascolta', { radioId: id }, r => { if (r && r.errore) toast(r.errore, 'err'); else { sbloccaAudio(); suono('ascolta'); } });
+}
+async function trasmettiGruppo(g) {
+  const me = mioStato();
+  const nuovo = me && me.trasmette === g ? null : g;
+  if (nuovo) await assicuraMic();
+  socket.emit('trasmetti', { gruppo: nuovo }, r => {
+    if (r && r.errore) return toast(r.errore, 'err');
+    suono(nuovo ? 'comunica' : 'txfine');
+  });
+}
+function cambiaStato(s, auto) { statoUtente = s; statoAuto = !!auto; socket && socket.emit('stato-utente', { stato: s }); }
+function mutaMic() {
+  if (cuffieMutate) { mutaCuffie(); return; }
+  micMutato = !micMutato;
+  aggiornaControlli(); socket.emit('audio', { micMutato, cuffieMutate });
+  suono(micMutato ? 'micoff' : 'micon');
+}
+function mutaCuffie() {
+  cuffieMutate = !cuffieMutate;
+  if (cuffieMutate) { micPrimaCuffie = micMutato; micMutato = true; fermaRiproduttori(); } else micMutato = micPrimaCuffie;
+  aggiornaMaster(); aggiornaControlli(); socket.emit('audio', { micMutato, cuffieMutate });
+}
+$('#btn-mic').onclick = mutaMic;
+$('#btn-cuffie').onclick = mutaCuffie;
+$('#btn-lascia').onclick = lasciaRadio;
+$('#btn-esci').onclick = () => esci();
+$('#btn-impostazioni').onclick = apriImpostazioni;
+$('#chi').onclick = apriAccount;
+$('#btn-msg').onclick = () => { pannelloAperto = !pannelloAperto; renderMessaggi(); };
+$('#pm-chiudi').onclick = () => { pannelloAperto = false; renderMessaggi(); };
+$('#sel-stato').onclick = e => { const b = e.target.closest('[data-stato]'); if (b) cambiaStato(b.dataset.stato); };
+document.querySelectorAll('.tab[data-vista]').forEach(b => b.onclick = () => cambiaVista(b.dataset.vista));
+function cambiaVista(v) {
+  vista = v;
+  document.querySelectorAll('.tab[data-vista]').forEach(b => b.classList.toggle('att', b.dataset.vista === v));
+  $('#vista-radio').hidden = v !== 'radio';
+  $('#vista-admin').hidden = v !== 'admin';
+  if (v === 'admin') renderAdmin(true);
+}
+
+// push-to-talk: tastiera (pagina in primo piano), pulsante sul sito o sul telefono
+const staScrivendo = e => e.target.matches && e.target.matches('input,textarea,select');
+addEventListener('keydown', e => {
+  segnaAttivita();
+  if (e.code === imp.tastoPtt && !e.repeat && !staScrivendo(e)) { e.preventDefault(); pttTasto = true; aggiornaControlli(); }
+});
+addEventListener('keyup', e => { if (e.code === imp.tastoPtt) { pttTasto = false; aggiornaControlli(); } });
+addEventListener('blur', () => { if (pttTasto || pttMouse) { pttTasto = pttMouse = false; aggiornaControlli(); } });
+const bp = $('#btn-ptt');
+bp.addEventListener('pointerdown', async e => { e.preventDefault(); bp.setPointerCapture(e.pointerId); pttMouse = true; aggiornaControlli(); await assicuraMic(); });
+for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) bp.addEventListener(ev, () => { if (pttMouse) { pttMouse = false; aggiornaControlli(); } });
+
+// modalità radio a tutto schermo: lo schermo resta acceso e il pulsante occupa quasi tutto
+let blocco = null;
+const tp = $('#tel-ptt');
+async function apriTel(apri) {
+  $('#radio-tel').hidden = !apri;
+  if (apri) { await assicuraMic(); try { blocco = await navigator.wakeLock.request('screen'); } catch { blocco = null; } }
+  else if (blocco) { blocco.release().catch(() => {}); blocco = null; }
+  aggiornaTel();
+}
+$('#btn-tel').onclick = () => apriTel(true);
+$('#rt-esci').onclick = () => apriTel(false);
+$('#rt-mic').onclick = () => $('#btn-mic').click();
+$('#rt-modo').onclick = () => { imp.modo = imp.modo === 'ptt' ? 'voce' : 'ptt'; salvaImp(); aggiornaControlli(); };
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && !$('#radio-tel').hidden && !blocco) try { blocco = await navigator.wakeLock.request('screen'); } catch {}
+});
+tp.addEventListener('pointerdown', async e => {
+  e.preventDefault(); tp.setPointerCapture(e.pointerId); pttMouse = true; aggiornaControlli(); await assicuraMic();
+  if (navigator.vibrate) navigator.vibrate(30);
+});
+for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) tp.addEventListener(ev, () => { if (pttMouse) { pttMouse = false; aggiornaControlli(); } });
+tp.addEventListener('contextmenu', e => e.preventDefault());
+function aggiornaTel() {
+  if ($('#radio-tel').hidden) return;
+  const me = mioStato(), r = me && radioDi(me.radioId), c = r && cat(r.categoriaId);
+  $('#rt-cat').textContent = c ? c.nome : '';
+  $('#rt-nome').textContent = r ? r.nome : 'Non sei in nessuna radio';
+  const altri = S.online.filter(u => parlanti.has(u.id) && u.id !== io_.id).map(u => u.nome);
+  $('#rt-parla').textContent = trasmetto ? '● STAI TRASMETTENDO' : altri.length ? '🔊 ' + altri.join(', ') : '';
+  tp.classList.toggle('on', trasmetto);
+  tp.disabled = !r && !(me && me.trasmette);
+  tp.innerHTML = !r ? 'ENTRA IN UNA RADIO<br>PRIMA' : trasmetto ? 'IN ONDA' : 'TIENI PREMUTO<br>PER PARLARE';
+  $('#rt-mic').textContent = micMutato ? '🎙 Microfono spento' : '🎙 Microfono acceso';
+  $('#rt-modo').textContent = imp.modo === 'ptt' ? 'Modo: pulsante' : 'Modo: voce automatica';
+}
+
+// inattivo automatico dopo 15 minuti senza attività
+let ultimaAttivita = Date.now();
+function segnaAttivita() {
+  ultimaAttivita = Date.now();
+  if (statoAuto && statoUtente === 'inattivo') cambiaStato('online');
+}
+['pointermove', 'pointerdown', 'wheel'].forEach(ev => addEventListener(ev, segnaAttivita, { passive: true }));
+setInterval(() => {
+  if (trasmetto) ultimaAttivita = Date.now();
+  if (io_ && statoUtente === 'online' && Date.now() - ultimaAttivita > 15 * 60000) cambiaStato('inattivo', true);
+}, 30000);
+
+// =====================================================================
+//  INTERFACCIA
+// =====================================================================
+function render() {
+  if (!io_ || io_.stato !== 'approvato') return;
+  renderTesta(); renderEmergenze(); renderChiamate(); renderRadio(); aggiornaControlli(); renderMessaggi(); aggiornaBannerAudio();
+  const nRich = (S.utenti || []).filter(u => u.stato === 'attesa').length;
+  $('#tab-admin').innerHTML = 'AMMINISTRAZIONE' + (nRich ? `<span class="badge">${nRich}</span>` : '');
+  if (vista === 'admin') renderAdmin();
+}
+
+function renderTesta() {
+  const me = mioStato();
+  const r = me && radioDi(me.radioId);
+  const pill = $('#pillola');
+  const parlo = pill.classList.contains('parlo');
+  if (me && me.silenziato) {
+    pill.className = 'pillola tx';
+    pill.innerHTML = `<small>LO STAFF TI HA</small><span>${IC.micOff} SILENZIATO</span>`;
+  } else if (me && me.trasmette) {
+    pill.className = 'pillola tx';
+    pill.innerHTML = `<small>IN COMUNICAZIONE CON</small><span>${IC.mic} ${esc(S.gruppi[me.trasmette].nome)}</span>`;
+  } else if (r) {
+    pill.className = 'pillola';
+    pill.innerHTML = `<small>CONNESSO A${me.ascolto.length ? ` · ASCOLTI ${me.ascolto.length} RADIO IN PIÙ` : ''}</small><span>${IC.mic} ${esc(r.nome)}</span>`;
+  } else {
+    pill.className = 'pillola off';
+    pill.innerHTML = '<small>NON CONNESSO</small><span>NESSUNA RADIO</span>';
+  }
+  pill.classList.toggle('parlo', parlo);
+  $('#chi').innerHTML = `${IC.utente} <b>${esc(io_.nome)}</b>${io_.grado ? `<span class="grado lungo">${esc(io_.grado)}</span>` : ''}`;
+  document.querySelectorAll('#sel-stato button').forEach(b => b.classList.toggle('att', b.dataset.stato === (me ? me.stato : statoUtente)));
+}
+
+// ordine fisso dei bottoni (in JavaScript la chiave '118' finirebbe sempre per prima)
+const gruppiOrdinati = () => Object.entries(S.gruppi).sort(([a], [b]) => ['ffoo', 'vvf', '118', 'soccorso'].indexOf(a) - ['ffoo', 'vvf', '118', 'soccorso'].indexOf(b));
+const contaAscoltatori = g => S.online.filter(u => gruppoUtente(u) === g).length;
+function renderEmergenze() {
+  const me = mioStato();
+  $('#emergenze').innerHTML = gruppiOrdinati().map(([k, g]) => {
+    const att = me && me.trasmette === k;
+    const reparti = S.categorie.filter(c => c.gruppo === k).map(c => c.nome).join(', ') || 'nessun reparto collegato';
+    return `<button class="btn-emerg ${att ? 'attivo' : ''}" data-gruppo="${k}" title="${att ? 'Clicca per chiudere la comunicazione' : 'Ti sentono: ' + esc(reparti)}">
+      📢 ${att ? 'In onda: ' + esc(g.nome) : esc(g.etichetta)}<span class="n">${contaAscoltatori(k)} in ascolto</span></button>`;
+  }).join('');
+}
+$('#emergenze').onclick = e => { const b = e.target.closest('[data-gruppo]'); if (b) trasmettiGruppo(b.dataset.gruppo); };
+
+let chiamatePrima = new Set();
+function renderChiamate() {
+  const me = mioStato();
+  const mioGruppo = gruppoUtente(io_);
+  const lista = S.online.filter(u => u.trasmette && u.id !== io_.id && (u.trasmette === mioGruppo || (me && me.trasmette === u.trasmette)));
+  const ora = new Set(lista.map(u => u.id + u.trasmette));
+  const nuove = lista.filter(u => !chiamatePrima.has(u.id + u.trasmette));
+  if (nuove.length) {
+    suono('allerta-gruppo');
+    for (const u of nuove) notifica('📢 Chiamata ' + S.gruppi[u.trasmette].nome, `${u.nome} sta comunicando al gruppo`);
+  }
+  chiamatePrima = ora;
+  $('#chiamate').innerHTML = lista.map(u => `<div class="chiamata" data-uid="${u.id}">
+      📢 ${esc(u.nome)}${u.grado ? ` · ${esc(u.grado)}` : ''} → ${esc(S.gruppi[u.trasmette].nome)}
+      ${me && me.trasmette === u.trasmette ? '' : `<button class="btn picc sec" data-rispondi="${u.trasmette}">RISPONDI</button>`}
+    </div>`).join('');
+}
+$('#chiamate').onclick = e => { const b = e.target.closest('[data-rispondi]'); if (b) trasmettiGruppo(b.dataset.rispondi); };
+
+function puoEntrareRadio(r) {
+  if (eStaff(io_)) return true;
+  const c = cat(r.categoriaId);
+  return !!c && (c.aperta || io_.categoriaId === c.id);
+}
+function renderRadio() {
+  const g = $('#griglia');
+  const scroll = {};
+  g.querySelectorAll('.col-corpo').forEach(el => scroll[el.dataset.cat] = el.scrollTop);
+  const me = mioStato();
+  // schede di sezione: di base si apre quella del proprio reparto
+  const sezioni = elencoSezioni(true);
+  if (!sezioni.some(x => x.id === sezioneVista)) {
+    const mia = cat(io_.categoriaId);
+    sezioneVista = mia ? sezioneDi(mia) : (sezioni[0] ? sezioni[0].id : 'tutte');
+  }
+  const corrente = sezioni.find(x => x.id === sezioneVista);
+  const miaRadio = me && radioDi(me.radioId);
+  const sezMiaRadio = miaRadio ? sezioneDi(cat(miaRadio.categoriaId)) : null;
+  $('#sezioni').hidden = sezioni.length < 2;
+  $('#sezioni').innerHTML = sezioni.map(x => {
+    const ids = new Set(x.cats.map(c => c.id));
+    const inRadio = S.online.filter(u => { const r = radioDi(u.radioId); return r && ids.has(r.categoriaId); }).length;
+    return `<button class="sez-tab ${x.id === sezioneVista ? 'att' : ''}" data-vsez="${x.id}" style="--col:${esc(x.colore)}">
+      ${sezMiaRadio === x.id ? '<span class="mia">TUA RADIO</span>' : ''}<b>${esc(x.nome)}</b>
+      <small>${x.id === 'tutte' ? 'tutti i reparti' : x.cats.length + (x.cats.length === 1 ? ' reparto' : ' reparti')} · ${inRadio} in radio</small></button>`;
+  }).join('');
+  let html = (corrente ? corrente.cats : S.categorie).map(c => {
+    const canali = S.radio.filter(r => r.categoriaId === c.id);
+    return `<section class="colonna"><h2 style="--col:${esc(c.colore)}">${esc(c.nome)}${c.gruppo ? `<small>${esc(S.gruppi[c.gruppo].nome)}</small>` : ''}</h2>
+      <div class="col-corpo" data-cat="${c.id}">${canali.map(r => renderCanale(r, me)).join('') || '<div class="vuoto">Nessuna radio</div>'}</div></section>`;
+  }).join('');
+  const fuori = S.online.filter(u => !u.radioId);
+  html += `<section class="colonna fuori"><h2>NON IN RADIO<small>CONNESSI AL SITO</small></h2>
+    <div class="col-corpo" data-cat="fuori"><div class="canale" data-radio=""><div class="utenti">
+    ${fuori.map(renderUtente).join('') || '<div class="vuoto">Nessuno</div>'}</div></div></div></section>`;
+  g.innerHTML = html;
+  g.querySelectorAll('.col-corpo').forEach(el => { if (scroll[el.dataset.cat]) el.scrollTop = scroll[el.dataset.cat]; });
+  aggiornaParlanti();
+}
+$('#sezioni').onclick = e => {
+  const b = e.target.closest('[data-vsez]');
+  if (!b) return;
+  sezioneVista = b.dataset.vsez;
+  localStorage.setItem('radio_sezione', sezioneVista);
+  renderRadio();
+};
+function renderCanale(r, me) {
+  const utenti = S.online.filter(u => u.radioId === r.id);
+  const ascoltatori = S.online.filter(u => u.ascolto.includes(r.id)).length;
+  const mio = me && me.radioId === r.id;
+  const ascolto = me && me.ascolto.includes(r.id);
+  const accesso = puoEntrareRadio(r);
+  const aperto = utenti.length > 0 && !collassati.has(r.id);
+  return `<div class="canale ${mio ? 'mio' : ''} ${ascolto ? 'ascolto' : ''} ${accesso ? '' : 'bloccato'}" data-radio="${r.id}">
+    <div class="riga-canale" tabindex="0" role="button" aria-label="${accesso ? (mio ? 'Sei in ' : 'Entra in ') : 'Nessun accesso a '}${esc(r.nome)}, ${utenti.length} ${utenti.length === 1 ? 'persona' : 'persone'}" title="${accesso ? 'Clicca per entrare' : 'Non hai accesso a questa radio'}">
+      <span class="nome-canale">${esc(r.nome)}</span>
+      ${accesso && !mio ? `<button class="btn-ascolta ${ascolto ? 'on' : ''}" data-ascolta="${r.id}" aria-label="${ascolto ? 'Smetti di ascoltare ' : 'Ascolta anche '}${esc(r.nome)}" title="${ascolto ? 'Smetti di ascoltare' : 'Ascolta anche questa radio (senza parlare)'}">${IC.onde}</button>` : ''}
+      <span class="conta ${utenti.length ? 'pieno' : ''}" title="${ascoltatori ? ascoltatori + ' in ascolto' : ''}">${IC.utente} ${utenti.length}${ascoltatori ? ` <small style="color:#6cb8ff">+${ascoltatori}</small>` : ''}</span>
+      <button class="chev ${aperto ? '' : 'giu'}" data-collassa="${r.id}" aria-expanded="${aperto}" aria-label="Elenco persone di ${esc(r.nome)}">${IC.chev}</button>
+    </div>
+    ${aperto ? `<div class="utenti">${utenti.map(renderUtente).join('')}</div>` : ''}
+  </div>`;
+}
+function renderUtente(u) {
+  const icone = (u.trasmette ? `<span class="tag">📢 ${esc(S.gruppi[u.trasmette].nome)}</span>` : '') +
+    (u.silenziato ? '<span class="tag grigio" title="Silenziato dallo staff">MUTO</span>' : '') +
+    (u.cuffie ? IC.cuffieOff : u.mic ? IC.micOff : '');
+  return `<div class="utente" data-uid="${u.id}" ${eStaff(io_) ? 'draggable="true"' : ''}>
+    <span class="pallino st-${u.stato}"></span>
+    <span class="nome-ut">${esc(u.nome)}${u.matricola ? ` (${esc(u.matricola)})` : ''}</span>
+    ${u.grado ? `<span class="grado">${esc(u.grado)}</span>` : ''}
+    <span class="icone-ut">${icone}</span></div>`;
+}
+function aggiornaControlli() {
+  const me = mioStato();
+  setTimeout(aggiornaTel, 0);
+  $('#btn-mic').innerHTML = (micMutato ? IC.micOff : IC.mic) + (micMutato ? ' Microfono spento' : ' Microfono');
+  $('#btn-mic').classList.toggle('off', micMutato);
+  $('#btn-cuffie').innerHTML = (cuffieMutate ? IC.cuffieOff : IC.cuffie) + (cuffieMutate ? ' Audio spento' : ' Audio');
+  $('#btn-cuffie').classList.toggle('off', cuffieMutate);
+  const premuto = pttPremuto();
+  bp.classList.toggle('on', premuto);
+  bp.textContent = premuto ? '🎙 STAI PARLANDO…' : (imp.modo === 'ptt' ? `🎙 TIENI PREMUTO (${imp.tastoPtt.replace('Key', '')})` : '🎙 PREMI PER FORZARE');
+  const ind = $('#ind-tx');
+  ind.classList.toggle('on', trasmetto);
+  ind.textContent = trasmetto ? '● IN TRASMISSIONE' : (imp.modo === 'ptt' ? 'PUSH-TO-TALK' : 'VOCE AUTOMATICA');
+  $('#btn-lascia').hidden = !(me && me.radioId);
+  programmaStatoApp();
+}
+
+// clic sulle radio: entrare, ascoltare, aprire/chiudere
+$('#vista-radio').addEventListener('click', e => {
+  const col = e.target.closest('[data-collassa]');
+  if (col) {
+    const id = col.dataset.collassa;
+    collassati.has(id) ? collassati.delete(id) : collassati.add(id);
+    localStorage.setItem('radio_collassati', JSON.stringify([...collassati]));
+    renderRadio(); return;
+  }
+  const asc = e.target.closest('[data-ascolta]');
+  if (asc) { ascoltaRadio(asc.dataset.ascolta); return; }
+  const riga = e.target.closest('.riga-canale');
+  if (riga) {
+    const r = radioDi(riga.parentElement.dataset.radio);
+    if (r && puoEntrareRadio(r)) entraRadio(r.id); else toast('Non hai accesso a questa radio', 'err');
+  }
+});
+$('#vista-radio').addEventListener('contextmenu', e => {
+  const u = e.target.closest('.utente');
+  if (!u) return;
+  e.preventDefault();
+  apriMenuUtente(u.dataset.uid, e.clientX, e.clientY);
+});
+$('#vista-radio').addEventListener('dragstart', e => { const u = e.target.closest('.utente'); if (u) e.dataTransfer.setData('text/plain', u.dataset.uid); });
+$('#vista-radio').addEventListener('dragover', e => {
+  const c = e.target.closest('.canale');
+  if (!c || !eStaff(io_)) return;
+  e.preventDefault();
+  document.querySelectorAll('.canale.drop').forEach(x => x !== c && x.classList.remove('drop'));
+  c.classList.add('drop');
+});
+$('#vista-radio').addEventListener('dragleave', e => { const c = e.target.closest('.canale'); if (c && !c.contains(e.relatedTarget)) c.classList.remove('drop'); });
+$('#vista-radio').addEventListener('drop', e => {
+  const c = e.target.closest('.canale');
+  document.querySelectorAll('.canale.drop').forEach(x => x.classList.remove('drop'));
+  if (!c) return;
+  e.preventDefault();
+  adm('admin:sposta-utente', { userId: e.dataTransfer.getData('text/plain'), radioId: c.dataset.radio || null });
+});
+
+function apriMenuUtente(uid, x, y) {
+  const u = S.online.find(o => o.id === uid);
+  if (!u) return;
+  const m = $('#menu-ctx');
+  let h = `<div class="tit">${esc(u.nome)}${u.grado ? ' · ' + esc(u.grado) : ''}</div>`;
+  if (uid !== io_.id) {
+    const v = Math.round((imp.volumi[uid] ?? 1) * 100);
+    h += `<div class="vol">🔊 <input type="range" min="0" max="200" value="${v}" data-volume="${uid}"><span>${v}%</span></div>`;
+  }
+  if (eStaff(io_)) {
+    h += '<div class="sez">Staff</div>';
+    if (u.radioId) h += '<button data-az="sposta" data-v="">⏏ Togli dalla radio</button>';
+    if (uid !== io_.id) h += `<button data-az="silenzia">${u.silenziato ? '🎙 Ridai la parola' : '🔇 Silenzia'}</button>`;
+    if (u.trasmette) h += '<button data-az="chiudi">📵 Chiudi la sua chiamata di gruppo</button>';
+    if (uid !== io_.id) h += '<button data-az="espelli">⛔ Disconnetti dal sito</button>';
+    h += '<button data-az="modifica">✎ Modifica utente</button>';
+    // con tante radio una lista lunghissima è scomoda: tendina divisa per sezione e reparto
+    h += '<div class="sez">Sposta in</div><select class="sposta-in"><option value="-">Scegli la radio…</option>' +
+      elencoSezioni(false).map(x => x.cats.map(c => `<optgroup label="${esc(x.nome)} · ${esc(c.nome)}">${S.radio.filter(r => r.categoriaId === c.id && r.id !== u.radioId)
+        .map(r => `<option value="${r.id}">${esc(r.nome)}</option>`).join('')}</optgroup>`).join('')).join('') + '</select>';
+  }
+  m.innerHTML = h;
+  m.hidden = false;
+  m.style.left = Math.min(x, innerWidth - 250) + 'px';
+  m.style.top = Math.max(10, Math.min(y, innerHeight - m.offsetHeight - 10)) + 'px';
+  m.onclick = ev => {
+    const b = ev.target.closest('button');
+    if (!b) return;
+    const az = b.dataset.az;
+    if (az === 'sposta') adm('admin:sposta-utente', { userId: uid, radioId: b.dataset.v || null });
+    if (az === 'silenzia') adm('admin:silenzia', { userId: uid, on: !u.silenziato });
+    if (az === 'chiudi') adm('admin:termina-chiamata', { userId: uid });
+    if (az === 'espelli' && confirm('Disconnettere ' + u.nome + ' dal sito?')) adm('admin:espelli', { userId: uid });
+    if (az === 'modifica') { filtroUtenti = u.nome; sezioneAdmin = 'utenti'; cambiaVista('admin'); }
+    m.hidden = true;
+  };
+  m.onchange = ev => {
+    if (!ev.target.matches('.sposta-in') || ev.target.value === '-') return;
+    adm('admin:sposta-utente', { userId: uid, radioId: ev.target.value });
+    m.hidden = true;
+  };
+  m.oninput = ev => {
+    const r = ev.target.closest('[data-volume]');
+    if (!r) return;
+    imp.volumi[uid] = r.value / 100; salvaImp();
+    r.nextElementSibling.textContent = r.value + '%';
+  };
+}
+document.addEventListener('pointerdown', e => { if (!e.target.closest('#menu-ctx')) $('#menu-ctx').hidden = true; });
+
+// =====================================================================
+//  MESSAGGI RADIO
+// =====================================================================
+function unisciMessaggi(lista) {
+  const visti = new Set(msgs.map(m => m.id));
+  for (const m of lista) if (!visti.has(m.id)) msgs.push(m);
+  if (msgs.length > 200) msgs = msgs.slice(-200);
+  renderMessaggi();
+}
+function aggiornaBadgeMsg() {
+  const b = $('#badge-msg');
+  b.hidden = !nonLetti;
+  b.textContent = nonLetti;
+}
+function renderMessaggi() {
+  const p = $('#pannello-msg');
+  p.hidden = !pannelloAperto;
+  if (pannelloAperto) { nonLetti = 0; aggiornaBadgeMsg(); }
+  const me = mioStato();
+  const r = me && radioDi(me.radioId);
+  $('#pm-canale').textContent = r ? '· ' + r.nome : '';
+  if (!pannelloAperto) return;
+  const visibili = msgs.filter(m => m.sistema || (me && (m.radioId === me.radioId || me.ascolto.includes(m.radioId))));
+  const lista = $('#pm-lista');
+  const inFondo = lista.scrollHeight - lista.scrollTop - lista.clientHeight < 40;
+  lista.innerHTML = visibili.map(m => {
+    const altra = me && m.radioId && m.radioId !== me.radioId ? `<span class="tag blu">${esc((radioDi(m.radioId) || {}).nome || '')}</span>` : '';
+    return `<div class="msg ${m.sistema ? 'sistema' : ''} ${io_ && m.da === io_.id ? 'mio' : ''}">
+      <div class="chi-msg">${esc(m.nome)}${m.grado ? ` <span class="grado">${esc(m.grado)}</span>` : ''} ${altra}<time>${esc(m.ora)}</time></div>${esc(m.testo)}</div>`;
+  }).join('') || `<div class="vuoto">${r ? 'Nessun messaggio in questa radio.' : 'Entra in una radio per leggere e scrivere i messaggi.'}</div>`;
+  if (inFondo) lista.scrollTop = lista.scrollHeight;
+}
+$('#pm-codici').innerHTML = CODICI_RAPIDI.map(c => `<button data-codice="${esc(c)}">${esc(c)}</button>`).join('');
+$('#pm-codici').onclick = e => { const b = e.target.closest('[data-codice]'); if (b) inviaMessaggio(b.dataset.codice); };
+$('#pm-form').onsubmit = e => { e.preventDefault(); const t = $('#pm-testo').value.trim(); if (t) inviaMessaggio(t, true); };
+function inviaMessaggio(testo, svuota) {
+  socket.emit('messaggio', { testo }, r => {
+    if (r && r.errore) return toast(r.errore, 'err');
+    if (svuota) $('#pm-testo').value = '';
+  });
+}
+
+// =====================================================================
+//  SOUNDBOARD (la sentono tutti nella tua radio)
+// =====================================================================
+const sb = $('#soundboard');
+sb.innerHTML = `<h3>🔊 SOUNDBOARD</h3><div class="nota">Il suono lo sentono tutti quelli nella tua radio.</div>
+  <div class="sb-griglia">${SUONI_SB.map(([id, ic, nome]) => `<button data-sb="${id}"><span>${ic}</span>${nome}</button>`).join('')}</div>`;
+const apriSb = () => { sb.hidden = !sb.hidden; };
+$('#btn-sb').onclick = e => { e.stopPropagation(); apriSb(); };
+$('#rt-sb').onclick = e => { e.stopPropagation(); apriSb(); };
+$('#rt-panico').onclick = () => apriModuloPanico();
+document.addEventListener('pointerdown', e => { if (!sb.hidden && !sb.contains(e.target) && !e.target.closest('#btn-sb,#rt-sb')) sb.hidden = true; });
+sb.onclick = e => {
+  const b = e.target.closest('[data-sb]');
+  if (!b) return;
+  sbloccaAudio();
+  socket.emit('soundboard', { id: b.dataset.sb }, r => {
+    if (r && r.errore) return toast(r.errore, 'err');
+    b.classList.add('suona'); setTimeout(() => b.classList.remove('suona'), 600);
+  });
+};
+function riceviSoundboard(d) {
+  suono(d.id, true);
+  const voce = SUONI_SB.find(x => x[0] === d.id);
+  if (voce && d.nome !== (io_ && io_.nome)) toast(`${voce[1]} ${d.nome}: ${voce[2]}`);
+}
+
+// =====================================================================
+//  PANICO
+// =====================================================================
+let timerPanico = null;
+const bpan = $('#btn-panico');
+bpan.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  const barra = bpan.querySelector('i');
+  barra.style.transition = 'width 1s linear';
+  barra.style.width = '100%';
+  timerPanico = setTimeout(() => {
+    barra.style.transition = 'none'; barra.style.width = '0';
+    apriModuloPanico();
+  }, 1000);
+});
+for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) bpan.addEventListener(ev, () => {
+  clearTimeout(timerPanico);
+  const barra = bpan.querySelector('i');
+  barra.style.transition = 'none'; barra.style.width = '0';
+});
+// prima di inviare: motivo e posizione sono obbligatori
+function apriModuloPanico() {
+  const f = $('#panico-form');
+  const motivi = ['Sparatoria', 'Agente a terra', 'Agente ferito', 'Rapina in corso', 'Inseguimento', 'Aggressione', 'Ostaggi', 'Incidente grave'];
+  f.innerHTML = `<div class="box"><div class="box-testa"><h1>🚨 INVIA PANICO</h1><p>L'allarme arriverà subito a tutti gli utenti connessi</p></div><div class="corpo">
+    <label>Motivo del panico</label><input id="pan-motivo" maxlength="120" placeholder="Cosa sta succedendo?" autocomplete="off">
+    <div class="motivi">${motivi.map(m => `<button type="button" data-motivo="${m}">${m}</button>`).join('')}</div>
+    <label>Posizione</label><input id="pan-luogo" maxlength="80" placeholder="Dove ti trovi? (via, edificio, zona)" autocomplete="off">
+    <button class="btn rosso" id="pan-invia">🚨 INVIA PANICO A TUTTI</button>
+    <button class="btn sec" id="pan-annulla">ANNULLA</button></div></div>`;
+  f.hidden = false;
+  suono('allerta-gruppo', true);
+  $('#pan-motivo').focus();
+  f.querySelector('.motivi').onclick = e => { const b = e.target.closest('[data-motivo]'); if (b) { $('#pan-motivo').value = b.dataset.motivo; $('#pan-luogo').focus(); } };
+  $('#pan-annulla').onclick = () => { f.hidden = true; };
+  const invia = () => {
+    const motivo = $('#pan-motivo').value.trim(), luogo = $('#pan-luogo').value.trim();
+    if (!motivo) { toast('Scrivi il motivo del panico', 'err'); return $('#pan-motivo').focus(); }
+    if (!luogo) { toast('Scrivi la tua posizione', 'err'); return $('#pan-luogo').focus(); }
+    $('#pan-invia').disabled = true;
+    socket.emit('panico', { motivo, luogo }, r => {
+      $('#pan-invia').disabled = false;
+      if (r && r.errore) return toast(r.errore, 'err');
+      f.hidden = true; suono('panicoinvio', true);
+      toast(`🚨 Allarme inviato a ${r.n} persone`);
+    });
+  };
+  $('#pan-invia').onclick = invia;
+  f.querySelectorAll('input').forEach(i => i.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); i.id === 'pan-motivo' ? $('#pan-luogo').focus() : invia(); } });
+}
+
+// allarme per tutti: lampeggia, suona finché non si conferma, il pulsante si attiva dopo 3 secondi
+let sirenaPanico = null, titoloPanico = null;
+const titoloOriginale = document.title;
+function fermaAllarme() {
+  clearInterval(sirenaPanico); clearInterval(titoloPanico); sirenaPanico = titoloPanico = null;
+  document.title = titoloOriginale; $('#allarme').hidden = true;
+  panicoApp = null; programmaStatoApp();
+}
+function mostraPanico(a) {
+  const mio = io_ && a.id === io_.id;
+  unisciMessaggi([{ id: 'p' + Date.now(), sistema: true, nome: '🚨 PANICO', testo: `${a.nome}${a.reparto ? ' (' + a.reparto + ')' : ''}: ${a.motivo || '—'}${a.luogo ? ' — 📍 ' + a.luogo : ''}`, ora: a.ora }]);
+  if (mio) return;
+  sbloccaAudio();
+  suono('sirena', true);
+  clearInterval(sirenaPanico); sirenaPanico = setInterval(() => suono('sirena', true), 2700);
+  clearInterval(titoloPanico); let acceso = false;
+  titoloPanico = setInterval(() => { acceso = !acceso; document.title = acceso ? '🚨 PANICO — ' + a.nome : titoloOriginale; }, 700);
+  if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 800]);
+  panicoApp = { nome: a.nome, motivo: a.motivo || '', luogo: a.luogo || '' }; programmaStatoApp();
+  annuncia(`Panico di ${a.nome}. Motivo: ${a.motivo || 'non indicato'}. Posizione: ${a.luogo || 'non indicata'}`, true);
+  if (APP) APP.notifica({ titolo: '🚨 PANICO: ' + a.nome, testo: `${a.motivo || ''} — 📍 ${a.luogo || ''}`, urgente: true });
+  else if ('Notification' in window && Notification.permission === 'granted') {
+    try { new Notification('🚨 PANICO: ' + a.nome, { body: `${a.motivo || ''} — 📍 ${a.luogo || ''}`, tag: 'panico', requireInteraction: true }); } catch {}
+  }
+  const el = $('#allarme');
+  el.innerHTML = `<div class="box"><div class="box-testa"><h1>🚨 PANICO 🚨</h1><p style="text-align:center">RICHIESTA DI AIUTO IMMEDIATO · ${esc(a.ora)}</p></div>
+    <div class="corpo"><div class="grande">${esc(a.nome)}${a.matricola ? ` (${esc(a.matricola)})` : ''}</div>
+    <div class="meta">${[a.grado, a.reparto].filter(Boolean).map(esc).join(' · ')}</div>
+    <div class="campo-pan"><small>MOTIVO</small><b>${esc(a.motivo || 'non indicato')}</b></div>
+    <div class="campo-pan"><small>📍 POSIZIONE</small><b>${esc(a.luogo || 'non indicata')}</b></div>
+    <button class="btn rosso" id="allarme-ok" disabled>LEGGI L'ALLARME… 3</button></div></div>`;
+  el.hidden = false;
+  const ok = $('#allarme-ok');
+  let n = 3;
+  const conta = setInterval(() => {
+    n--;
+    if (n > 0) { ok.textContent = `LEGGI L'ALLARME… ${n}`; return; }
+    clearInterval(conta); ok.disabled = false; ok.textContent = '✅ HO VISTO — VADO A VEDERE';
+  }, 1000);
+  ok.onclick = fermaAllarme;
+}
+
+function notifica(titolo, testo) {
+  if (APP) { if (imp.notifiche) APP.notifica({ titolo, testo }); return; }      // nell'app decide il programma se la finestra è in primo piano
+  if (!imp.notifiche || !document.hidden || !('Notification' in window) || Notification.permission !== 'granted') return;
+  try { new Notification(titolo, { body: testo, tag: titolo }); } catch {}
+}
+
+// =====================================================================
+//  IMPOSTAZIONI AUDIO E ACCOUNT
+// =====================================================================
+async function apriImpostazioni() {
+  await assicuraMic();
+  const disp = await navigator.mediaDevices?.enumerateDevices().catch(() => []) || [];
+  const ingressi = disp.filter(d => d.kind === 'audioinput');
+  const uscite = disp.filter(d => d.kind === 'audiooutput');
+  const puoUscita = elUscita && typeof elUscita.setSinkId === 'function';
+  const m = $('#modale');
+  m.innerHTML = `<div class="box"><div class="box-testa"><h1>AUDIO</h1><p>MICROFONO, ASCOLTO E PUSH-TO-TALK</p></div><div class="corpo">
+    <label>Modalità di trasmissione</label>
+    <div class="scelta" id="i-modo"><button data-m="voce" class="${imp.modo === 'voce' ? 'att' : ''}">Voce automatica</button>
+      <button data-m="ptt" class="${imp.modo === 'ptt' ? 'att' : ''}">Push-to-talk</button></div>
+    <div class="riga-form"><span class="nota">Tasto sul sito:</span><button class="btn sec picc" id="i-tasto">${esc(imp.tastoPtt)}</button>
+      <span class="nota">${APP ? '· i tasti che funzionano anche dentro il gioco sono nella sezione «Tasti e app» qui sotto' : '· mentre giochi a Roblox usa la voce automatica o il telefono come radio (o scarica l\'app per computer)'}</span></div>
+    <label>Microfono</label>
+    <select id="i-mic"><option value="">Predefinito di sistema</option>${ingressi.map(d =>
+      `<option value="${esc(d.deviceId)}" ${d.deviceId === imp.microfono ? 'selected' : ''}>${esc(d.label || 'Microfono')}</option>`).join('')}</select>
+    <label>Livello del microfono (la linea bianca è la soglia della voce automatica)</label>
+    <div class="misuratore"><i id="misura-mic"></i><b id="soglia-mic"></b></div>
+    <label>Sensibilità</label><input type="range" id="i-sens" min="1" max="100" value="${imp.sensibilita}">
+    ${puoUscita ? `<label>Uscita audio</label><select id="i-uscita"><option value="">Predefinita di sistema</option>${uscite.map(d =>
+      `<option value="${esc(d.deviceId)}" ${d.deviceId === imp.uscita ? 'selected' : ''}>${esc(d.label || 'Uscita')}</option>`).join('')}</select>` : ''}
+    <label>Volume generale</label><input type="range" id="i-vol" min="0" max="200" value="${Math.round(imp.volumeGenerale * 100)}">
+    <label class="chk"><input type="checkbox" id="i-eff" ${imp.effettoRadio ? 'checked' : ''}> Effetto radio sulla voce e scatto di inizio trasmissione</label>
+    <label class="chk"><input type="checkbox" id="i-eco" ${imp.riduzioneEco ? 'checked' : ''}> Riduzione eco (consigliata se non usi le cuffie)</label>
+    <label class="chk"><input type="checkbox" id="i-suoni" ${imp.suoni ? 'checked' : ''}> Suoni della radio (ingresso, messaggi, allarmi)</label>
+    <div class="riga-form"><button class="btn sec picc" id="i-prova">🎧 PROVA MICROFONO (5 s)</button>
+      <button class="btn sec picc" id="i-notifiche">🔔 ${imp.notifiche ? 'NOTIFICHE ATTIVE' : 'ATTIVA NOTIFICHE'}</button></div>
+    <h3 style="margin:14px 0 4px;font-family:var(--oswald);letter-spacing:1px">ACCESSIBILITÀ</h3>
+    <label class="chk"><input type="checkbox" id="i-contrasto" ${imp.altoContrasto ? 'checked' : ''}> Alto contrasto</label>
+    <label id="l-scala">Dimensione di testi e pulsanti</label>
+    <div class="scelta" id="i-scala" role="group" aria-labelledby="l-scala">${['Normale', 'Grande', 'Molto grande'].map((n, i) => `<button data-s="${i}" class="${imp.scala === i ? 'att' : ''}" aria-pressed="${imp.scala === i}">${n}</button>`).join('')}</div>
+    <label class="chk"><input type="checkbox" id="i-annunci" ${imp.annunciaParlanti ? 'checked' : ''}> Annuncia a voce (per lettori di schermo) chi sta parlando</label>
+    ${APP ? '<div id="pannello-app" class="pannello-app"></div>' : ''}
+    <button class="btn" id="i-chiudi">CHIUDI</button></div></div>`;
+  m.hidden = false;
+  if (APP) riempiPannelloApp();
+  $('#i-contrasto').onchange = e => { imp.altoContrasto = e.target.checked; salvaImp(); applicaAccessibilita(); };
+  $('#i-scala').onclick = e => { const b = e.target.closest('[data-s]'); if (!b) return; imp.scala = +b.dataset.s; salvaImp(); applicaAccessibilita();
+    document.querySelectorAll('#i-scala button').forEach(x => { x.classList.toggle('att', x === b); x.setAttribute('aria-pressed', x === b); }); };
+  $('#i-annunci').onchange = e => { imp.annunciaParlanti = e.target.checked; salvaImp(); };
+  $('#i-modo').onclick = e => { const b = e.target.closest('[data-m]'); if (!b) return; imp.modo = b.dataset.m; salvaImp();
+    document.querySelectorAll('#i-modo button').forEach(x => x.classList.toggle('att', x === b)); aggiornaControlli(); };
+  $('#i-mic').onchange = e => cambiaMicrofono(e.target.value);
+  $('#i-sens').oninput = e => { imp.sensibilita = +e.target.value; salvaImp(); };
+  if (puoUscita) $('#i-uscita').onchange = e => { imp.uscita = e.target.value; salvaImp(); elUscita.setSinkId(imp.uscita).catch(() => toast('Uscita non disponibile', 'err')); };
+  $('#i-vol').oninput = e => { imp.volumeGenerale = e.target.value / 100; salvaImp(); aggiornaMaster(); };
+  $('#i-eff').onchange = e => { imp.effettoRadio = e.target.checked; salvaImp(); riproduttori.forEach(collegaEffetto); };
+  $('#i-eco').onchange = async e => { imp.riduzioneEco = e.target.checked; salvaImp(); await collegaUscita(); };
+  $('#i-suoni').onchange = e => { imp.suoni = e.target.checked; salvaImp(); };
+  $('#i-tasto').onclick = e => {
+    e.target.textContent = 'Premi un tasto…';
+    addEventListener('keydown', ev => { ev.preventDefault(); imp.tastoPtt = ev.code; salvaImp(); e.target.textContent = ev.code; aggiornaControlli(); }, { once: true });
+  };
+  $('#i-prova').onclick = provaMicrofono;
+  $('#i-notifiche').onclick = async () => {
+    if (APP) { imp.notifiche = !imp.notifiche; salvaImp(); $('#i-notifiche').textContent = imp.notifiche ? '🔔 NOTIFICHE ATTIVE' : '🔔 ATTIVA NOTIFICHE'; return; }
+    if (!('Notification' in window)) return toast('Il browser non supporta le notifiche', 'err');
+    const p = await Notification.requestPermission();
+    imp.notifiche = p === 'granted'; salvaImp();
+    $('#i-notifiche').textContent = imp.notifiche ? '🔔 NOTIFICHE ATTIVE' : '🔔 ATTIVA NOTIFICHE';
+    if (!imp.notifiche) toast('Notifiche bloccate dal browser', 'err');
+  };
+  $('#i-chiudi').onclick = () => { m.hidden = true; m.innerHTML = ''; };
+}
+// prova del microfono: ti senti per 5 secondi (con l'effetto radio se attivo)
+async function provaMicrofono() {
+  if (!(await assicuraMic())) return;
+  const s = ctx.createMediaStreamSource(micStream);
+  const r = { nodo: s, gain: ctx.createGain(), hp: ctx.createBiquadFilter(), lp: ctx.createBiquadFilter(), dist: ctx.createWaveShaper() };
+  r.hp.type = 'highpass'; r.hp.frequency.value = 300; r.lp.type = 'lowpass'; r.lp.frequency.value = 3600; r.dist.curve = curvaDistorsione(2);
+  collegaEffetto(r);
+  r.gain.connect(master);
+  toast('Parla adesso: ti senti per 5 secondi');
+  setTimeout(() => { try { s.disconnect(); r.gain.disconnect(); } catch {} }, 5000);
+}
+
+function apriAccount() {
+  const m = $('#modale');
+  const fissoOStaff = io_.username === 'admin' || io_.username.startsWith('staff.');
+  m.innerHTML = `<div class="box"><div class="box-testa"><h1>IL MIO ACCOUNT</h1><p>${esc(io_.nome)} · ${esc(io_.username)}</p></div><div class="corpo">
+    <div class="meta">Ruolo: <b>${io_.ruolo === 'admin' ? 'Amministratore' : io_.ruolo === 'staff' ? 'Staff' : 'Utente'}</b>
+      ${io_.grado ? ` · Grado: <b>${esc(io_.grado)}</b>` : ''}${cat(io_.categoriaId) ? ` · Reparto: <b>${esc(cat(io_.categoriaId).nome)}</b>` : ''}</div>
+    <div class="meta">Nome Roblox: <b>${esc(io_.roblox || '—')}</b></div>
+    ${fissoOStaff ? '' : `<h3 style="margin:6px 0 0;font-family:var(--oswald)">CAMBIA PASSWORD</h3>
+      <input type="password" id="acc-vecchia" placeholder="Password attuale" autocomplete="current-password">
+      <input type="password" id="acc-nuova" placeholder="Nuova password (minimo 6 caratteri)" autocomplete="new-password">
+      <button class="btn sec picc" id="acc-pw">SALVA PASSWORD</button>`}
+    <button class="btn" id="acc-chiudi">CHIUDI</button></div></div>`;
+  m.hidden = false;
+  $('#acc-chiudi').onclick = () => { m.hidden = true; m.innerHTML = ''; };
+  if ($('#acc-pw')) $('#acc-pw').onclick = () => socket.emit('cambia-password', { vecchia: $('#acc-vecchia').value, nuova: $('#acc-nuova').value },
+    r => r.errore ? toast(r.errore, 'err') : (toast('Password cambiata'), m.hidden = true));
+}
+
+// =====================================================================
+//  AMMINISTRAZIONE (admin e staff)
+// =====================================================================
+function opzioniCategorie(scelta, conNessuna = true) {
+  return (conNessuna ? '<option value="">— Nessuna (cittadino) —</option>' : '') +
+    elencoSezioni(false).map(x => `<optgroup label="${esc(x.nome)}">${x.cats.map(c =>
+      `<option value="${c.id}" ${c.id === scelta ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</optgroup>`).join('');
+}
+function opzioniSezioni(scelta) {
+  return '<option value="">Senza sezione (Altre)</option>' + (S.sezioni || []).map(x =>
+    `<option value="${x.id}" ${x.id === scelta ? 'selected' : ''}>Sezione: ${esc(x.nome)}</option>`).join('');
+}
+function opzioniGruppi(scelto) {
+  return '<option value="">Nessun gruppo</option>' + gruppiOrdinati().map(([k, g]) =>
+    `<option value="${k}" ${k === scelto ? 'selected' : ''}>Gruppo: ${esc(g.nome)}</option>`).join('');
+}
+const data = t => new Date(t).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
+function adm(evento, dati, ok) {
+  return new Promise(res => socket.emit(evento, dati, r => {
+    if (r && r.errore) toast(r.errore, 'err'); else if (ok) toast(ok);
+    res(r || {});
+  }));
+}
+
+function renderAdmin(forza) {
+  const v = $('#vista-admin');
+  const attivo = document.activeElement;
+  if (!forza && ((v.contains(attivo) && attivo.matches('input,select,textarea')) || v.querySelector('[data-sporco]'))) { adminPendente = true; return; }
+  adminPendente = false;
+  const nRich = (S.utenti || []).filter(u => u.stato === 'attesa').length;
+  const sezioni = [['richieste', `Richieste${nRich ? ` (${nRich})` : ''}`], ['utenti', 'Utenti e staff'], ['categorie', 'Categorie e radio'],
+                   ['registro', 'Registro'], ['impostazioni', 'Impostazioni']];
+  v.innerHTML = `<div class="admin-nav">${sezioni.map(([k, l]) => `<button class="${sezioneAdmin === k ? 'att' : ''}" data-sez="${k}">${l}</button>`).join('')}</div>
+    <div id="admin-corpo">${{ richieste: htmlRichieste, utenti: htmlUtenti, categorie: htmlCategorie, registro: htmlRegistro, impostazioni: htmlImpostazioni }[sezioneAdmin]()}</div>`;
+}
+$('#vista-admin').addEventListener('focusout', () => setTimeout(() => { if (adminPendente) renderAdmin(); }, 50));
+
+function htmlRichieste() {
+  const lista = S.utenti.filter(u => u.stato === 'attesa');
+  if (!lista.length) return '<div class="card"><div class="vuoto">Nessuna richiesta in attesa.</div></div>';
+  return lista.map(u => `<div class="card" data-card="${u.id}">
+    <h3>${esc(u.nome)}</h3>
+    <div class="meta">Utente: <b>${esc(u.username)}</b> · Richiesta del ${data(u.creato)}<br>
+      Reparto richiesto: <b>${esc((cat(u.categoriaRichiesta) || {}).nome || 'Nessuno / cittadino')}</b>${u.roblox ? ` · Roblox: <b>${esc(u.roblox)}</b>` : ''}${u.motivazione ? `<br>Motivazione: ${esc(u.motivazione)}` : ''}</div>
+    <div class="riga-form">
+      <select class="r-cat" style="flex:1 1 200px">${opzioniCategorie(u.categoriaRichiesta)}</select>
+      <input class="r-grado" placeholder="Grado (es. Allievo Carabiniere)" style="flex:1 1 200px">
+      <input class="r-matr" placeholder="Matricola" value="${esc(u.matricola)}" style="flex:0 1 110px">
+      <button class="btn verde picc" data-azione="approva">✔ ACCETTA</button>
+      <button class="btn picc" data-azione="rifiuta">✖ RIFIUTA</button>
+    </div></div>`).join('');
+}
+function htmlUtenti() {
+  return `<div class="card"><div class="riga-form" style="margin-bottom:10px">
+      <input id="filtro-utenti" placeholder="Cerca per nome o utente…" value="${esc(filtroUtenti)}" style="flex:1"></div>
+    <div id="tab-utenti">${htmlTabellaUtenti()}</div>
+    <div class="nota" style="margin-top:8px">Lo <b>staff</b> ha gli stessi permessi dell’amministratore. Le modifiche si salvano da sole.
+      Per togliere l’accesso a un account basta metterlo “Rifiutato / sospeso”.</div></div>`;
+}
+function htmlTabellaUtenti() {
+  const f = filtroUtenti.toLowerCase();
+  const lista = S.utenti.filter(u => !f || u.nome.toLowerCase().includes(f) || u.username.includes(f));
+  return `<table><thead><tr><th></th><th>Personaggio</th><th>Matr.</th><th>Utente</th><th>Categoria</th><th>Grado</th><th>Ruolo</th><th>Accesso</th><th>Nome Roblox</th><th></th></tr></thead><tbody>
+  ${lista.map(u => {
+    const proprietario = u.ruolo === 'admin', ioStesso = u.id === io_.id;
+    return `<tr data-uid="${u.id}">
+      <td><span class="pallino ${u.online ? '' : 'st-offline'}" title="${u.online ? 'Connesso' : 'Non connesso'}"></span></td>
+      <td><input data-campo="nome" value="${esc(u.nome)}"></td>
+      <td style="width:80px"><input data-campo="matricola" value="${esc(u.matricola)}"></td>
+      <td>${esc(u.username)}</td>
+      <td><select data-campo="categoriaId">${opzioniCategorie(u.categoriaId)}</select></td>
+      <td><input data-campo="grado" value="${esc(u.grado)}"></td>
+      <td><select data-campo="ruolo" ${proprietario || ioStesso ? 'disabled' : ''}>
+        ${proprietario ? '<option>Amministratore</option>' : `<option value="utente" ${u.ruolo === 'utente' ? 'selected' : ''}>Utente</option><option value="staff" ${u.ruolo === 'staff' ? 'selected' : ''}>Staff</option>`}</select></td>
+      <td><select data-campo="stato" ${proprietario || ioStesso ? 'disabled' : ''}>
+        <option value="approvato" ${u.stato === 'approvato' ? 'selected' : ''}>Approvato</option>
+        <option value="attesa" ${u.stato === 'attesa' ? 'selected' : ''}>In attesa</option>
+        <option value="rifiutato" ${u.stato === 'rifiutato' ? 'selected' : ''}>Rifiutato / sospeso</option></select></td>
+      <td><input data-campo="roblox" value="${esc(u.roblox || '')}" placeholder="—"></td>
+      <td style="white-space:nowrap"><button class="ico-btn" data-azione="password" title="Reimposta password">🔑</button>
+        ${proprietario || ioStesso ? '' : '<button class="ico-btn rosso" data-azione="elimina-utente" title="Elimina">🗑</button>'}</td></tr>`;
+  }).join('')}</tbody></table>${lista.length ? '' : '<div class="vuoto">Nessun utente trovato.</div>'}`;
+}
+function htmlCategorie() {
+  const sez = S.sezioni || [];
+  let html = `<div class="card"><h3>SEZIONI DEL SITO</h3>
+    ${sez.map((x, i) => `<div class="sez-testa" data-sezid="${x.id}">
+      <input data-scampo="nome" value="${esc(x.nome)}">
+      <input data-scampo="colore" type="color" value="${esc(x.colore)}">
+      <span class="nota">${S.categorie.filter(c => c.sezioneId === x.id).length} reparti</span>
+      <span style="white-space:nowrap">
+        <button class="ico-btn" data-azione="sez-su" ${i === 0 ? 'disabled' : ''}>▲</button>
+        <button class="ico-btn" data-azione="sez-giu" ${i === sez.length - 1 ? 'disabled' : ''}>▼</button>
+        <button class="ico-btn rosso" data-azione="sez-elimina" title="Elimina la sezione (i reparti restano, in Altre)">🗑</button></span>
+    </div>`).join('')}
+    <div class="riga-form"><input id="ns-nome" placeholder="Nome nuova sezione (es. CIVILI)" style="flex:1">
+      <button class="btn picc sec" data-azione="crea-sezione">+ AGGIUNGI SEZIONE</button></div></div>
+  <div class="card"><h3>NUOVA CATEGORIA / REPARTO</h3>
+    <div class="cat-testa">
+      <input id="nc-nome" placeholder="Nome (es. Polizia Penitenziaria)">
+      <input id="nc-col" type="color" value="#c8102e">
+      <select id="nc-gruppo">${opzioniGruppi(null)}</select>
+      <select id="nc-sez">${opzioniSezioni(sez[0] && sez[0].id)}</select>
+      <label class="chk"><input type="checkbox" id="nc-aperta"> Aperta a tutti</label>
+      <button class="btn picc" data-azione="crea-categoria">+ CREA</button>
+    </div></div>`;
+  for (const x of elencoSezioni(false)) {
+    html += `<div class="titolo-sez" style="--col:${esc(x.colore)}">${esc(x.nome)}</div>` +
+    x.cats.map((c, i) => `<div class="card" data-cat="${c.id}">
+    <div class="cat-testa">
+      <input data-ccampo="nome" value="${esc(c.nome)}">
+      <input data-ccampo="colore" type="color" value="${esc(c.colore)}">
+      <select data-ccampo="gruppo">${opzioniGruppi(c.gruppo)}</select>
+      <select data-ccampo="sezioneId">${opzioniSezioni(c.sezioneId)}</select>
+      <label class="chk"><input type="checkbox" data-ccampo="aperta" ${c.aperta ? 'checked' : ''}> Aperta a tutti</label>
+      <span style="white-space:nowrap">
+        <button class="ico-btn" data-azione="cat-su" ${i === 0 ? 'disabled' : ''}>▲</button>
+        <button class="ico-btn" data-azione="cat-giu" ${i === x.cats.length - 1 ? 'disabled' : ''}>▼</button>
+        <button class="ico-btn rosso" data-azione="cat-elimina" title="Elimina categoria e radio">🗑</button></span>
+    </div>
+    <div class="cat-radio" style="--col:${esc(c.colore)}">
+      ${S.radio.filter(r => r.categoriaId === c.id).map(r => `<div class="r" data-radio="${r.id}">
+        <input data-rcampo="nome" value="${esc(r.nome)}">
+        <select data-rcampo="categoriaId" title="Sposta in un'altra categoria">${opzioniCategorie(c.id, false)}</select>
+        <span style="white-space:nowrap"><button class="ico-btn" data-azione="radio-su">▲</button><button class="ico-btn" data-azione="radio-giu">▼</button>
+        <button class="ico-btn rosso" data-azione="radio-elimina">🗑</button></span></div>`).join('')}
+      <div class="riga-form"><input class="nuova-radio" placeholder="Nome nuova radio (es. PMZ 13)" style="flex:1">
+        <button class="btn picc sec" data-azione="crea-radio">+ AGGIUNGI RADIO</button></div>
+    </div></div>`).join('');
+  }
+  return html;
+}
+function htmlRegistro() {
+  if (!registroCaricato) {
+    registroCaricato = true;
+    adm('admin:registro', {}).then(r => { if (r.registro && r.registro.length) { registro = r.registro; renderAdmin(true); } });
+  }
+  return `<div class="card"><div class="riga-form" style="margin-bottom:8px"><h3 style="margin:0;flex:1">REGISTRO ATTIVITÀ</h3>
+    <button class="btn sec picc" data-azione="svuota-registro">SVUOTA</button></div>
+    ${registro.map(r => `<div class="reg ${r.tipo === 'panico' ? 'panico' : ''}"><time>${data(r.t)}</time><span>${esc(r.msg)}</span></div>`).join('') || '<div class="vuoto">Ancora nessuna attività registrata.</div>'}</div>`;
+}
+function htmlImpostazioni() {
+  return `<div class="card"><h3>PASSWORD “ACCESSO STAFF”</h3>
+      <div class="riga-form"><input id="pw-staff" type="password" placeholder="Nuova password staff" autocomplete="off" style="flex:1">
+        <button class="btn picc" data-azione="password-staff">SALVA</button></div>
+      <div class="nota" style="margin-top:6px">Chi conosce questa password entra come staff con tutti i permessi. Quella iniziale è <b>123</b>: cambiala.</div></div>
+`;
+}
+
+const va = $('#vista-admin');
+va.addEventListener('input', e => {
+  if (e.target.id === 'filtro-utenti') { filtroUtenti = e.target.value; $('#tab-utenti').innerHTML = htmlTabellaUtenti(); return; }
+  const card = e.target.closest('[data-card]');
+  if (card) card.dataset.sporco = '1';
+});
+va.addEventListener('change', async e => {
+  const t = e.target;
+  const riga = t.closest('tr[data-uid]');
+  if (riga && t.dataset.campo) { await adm('admin:modifica-utente', { userId: riga.dataset.uid, [t.dataset.campo]: t.value }, 'Utente aggiornato'); return renderAdmin(true); }
+  const c = t.closest('[data-cat]');
+  if (c && t.dataset.ccampo) {
+    await adm('admin:categoria-modifica', { id: c.dataset.cat, [t.dataset.ccampo]: t.type === 'checkbox' ? t.checked : t.value }, 'Categoria aggiornata');
+    return renderAdmin(true);
+  }
+  const sz = t.closest('[data-sezid]');
+  if (sz && t.dataset.scampo) { await adm('admin:sezione-modifica', { id: sz.dataset.sezid, [t.dataset.scampo]: t.value }, 'Sezione aggiornata'); return renderAdmin(true); }
+  const r = t.closest('[data-radio]');
+  if (r && t.dataset.rcampo) { await adm('admin:radio-modifica', { id: r.dataset.radio, [t.dataset.rcampo]: t.value }, 'Radio aggiornata'); renderAdmin(true); }
+});
+va.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (e.target.classList.contains('nuova-radio')) e.target.closest('.riga-form').querySelector('[data-azione]').click();
+  if (e.target.id === 'nc-nome') va.querySelector('[data-azione="crea-categoria"]').click();
+  if (e.target.id === 'ns-nome') va.querySelector('[data-azione="crea-sezione"]').click();
+});
+va.addEventListener('click', async e => {
+  const sez = e.target.closest('[data-sez]');
+  if (sez) { sezioneAdmin = sez.dataset.sez; renderAdmin(true); return; }
+  const b = e.target.closest('[data-azione]');
+  if (!b) return;
+  const a = b.dataset.azione;
+  const card = b.closest('[data-card]'), riga = b.closest('tr[data-uid]'), c = b.closest('[data-cat]'), r = b.closest('[data-radio]');
+  if (a === 'approva') {
+    await adm('admin:approva', { userId: card.dataset.card, categoriaId: card.querySelector('.r-cat').value,
+      grado: card.querySelector('.r-grado').value, matricola: card.querySelector('.r-matr').value }, 'Richiesta accettata');
+  } else if (a === 'rifiuta') {
+    if (!confirm('Rifiutare questa richiesta?')) return;
+    await adm('admin:rifiuta', { userId: card.dataset.card }, 'Richiesta rifiutata');
+  } else if (a === 'password') {
+    const pw = prompt('Nuova password per questo utente (minimo 6 caratteri):');
+    if (!pw) return;
+    await adm('admin:modifica-utente', { userId: riga.dataset.uid, password: pw }, 'Password reimpostata');
+  } else if (a === 'elimina-utente') {
+    if (!confirm('Eliminare definitivamente questo utente?')) return;
+    await adm('admin:elimina-utente', { userId: riga.dataset.uid }, 'Utente eliminato');
+  } else if (a === 'crea-categoria') {
+    await adm('admin:categoria-crea', { nome: $('#nc-nome').value, colore: $('#nc-col').value, gruppo: $('#nc-gruppo').value,
+      sezioneId: $('#nc-sez').value, aperta: $('#nc-aperta').checked }, 'Categoria creata');
+  } else if (a === 'crea-sezione') {
+    await adm('admin:sezione-crea', { nome: $('#ns-nome').value }, 'Sezione creata');
+  } else if (a === 'sez-su' || a === 'sez-giu') {
+    await adm('admin:sezione-sposta', { id: b.closest('[data-sezid]').dataset.sezid, dir: a === 'sez-su' ? 'su' : 'giu' });
+  } else if (a === 'sez-elimina') {
+    if (!confirm('Eliminare la sezione? I reparti dentro non vengono cancellati: finiscono in "Altre".')) return;
+    await adm('admin:sezione-elimina', { id: b.closest('[data-sezid]').dataset.sezid }, 'Sezione eliminata');
+  } else if (a === 'cat-su' || a === 'cat-giu') {
+    await adm('admin:categoria-sposta', { id: c.dataset.cat, dir: a === 'cat-su' ? 'su' : 'giu' });
+  } else if (a === 'cat-elimina') {
+    if (!confirm('Eliminare la categoria e TUTTE le sue radio?')) return;
+    await adm('admin:categoria-elimina', { id: c.dataset.cat }, 'Categoria eliminata');
+  } else if (a === 'crea-radio') {
+    await adm('admin:radio-crea', { categoriaId: c.dataset.cat, nome: b.closest('.riga-form').querySelector('.nuova-radio').value }, 'Radio aggiunta');
+  } else if (a === 'radio-su' || a === 'radio-giu') {
+    await adm('admin:radio-sposta', { id: r.dataset.radio, dir: a === 'radio-su' ? 'su' : 'giu' });
+  } else if (a === 'radio-elimina') {
+    if (!confirm('Eliminare questa radio?')) return;
+    await adm('admin:radio-elimina', { id: r.dataset.radio }, 'Radio eliminata');
+  } else if (a === 'password-staff') {
+    if (!$('#pw-staff').value) return toast('Scrivi la nuova password', 'err');
+    await adm('admin:password-staff', { password: $('#pw-staff').value }, 'Password staff aggiornata');
+  } else if (a === 'svuota-registro') {
+    if (!confirm('Svuotare il registro?')) return;
+    await adm('admin:svuota-registro', {});
+    const res = await adm('admin:registro', {});
+    registro = res.registro || [];
+  } else return;
+  renderAdmin(true);
+});
+
+// =====================================================================
+//  AVVIO
+// =====================================================================
+fetch('/api/info').then(r => r.ok ? r.json() : null).catch(() => null).then(i => {
+  if (!i || !i.versione || i.versione < '2') toast('Il server in esecuzione è una versione vecchia: chiudilo e riavvialo con i file nuovi', 'err');
+});
+if (token) { connetti(); } else mostra('accesso');
+
+// =====================================================================
+//  ACCESSIBILITÀ (vale sia per il sito sia per l'app)
+// =====================================================================
+function annuncia(testo, urgente) {          // messaggio per i lettori di schermo
+  const e = $(urgente ? '#annuncio-urg' : '#annuncio'); if (!e) return;
+  e.textContent = ''; setTimeout(() => { e.textContent = testo; }, 60);
+}
+function applicaAccessibilita() {
+  document.body.classList.toggle('alto-contrasto', !!imp.altoContrasto);
+  document.documentElement.style.zoom = [1, 1.2, 1.4][imp.scala] || 1;
+}
+applicaAccessibilita();
+{ const m = $('#modale'); if (m) { m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); } }
+// radio e pulsanti raggiungibili con la tastiera: Invio o Spazio sulla riga di una radio equivale al clic
+$('#vista-radio').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.riga-canale')) { e.preventDefault(); e.target.click(); }
+});
+// Esc chiude la finestra aperta (impostazioni, account, ecc.) e riporta il focus
+addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const m = $('#modale'); if (!m || m.hidden) return;
+  const b = m.querySelector('[id$=chiudi],[id$=annulla]'); if (b) { e.preventDefault(); b.click(); }
+});
+new MutationObserver(() => { const m = $('#modale'); if (m && !m.hidden && !m.contains(document.activeElement)) { const p = m.querySelector('select,input,button'); if (p) p.focus(); } })
+  .observe($('#modale'), { attributes: true, attributeFilter: ['hidden'] });
+
+// =====================================================================
+//  APP PER COMPUTER (attiva solo se la radio è aperta dentro l'app: tasti globali, notifiche, mini-finestra)
+// =====================================================================
+var APP = window.appRadio || null, panicoApp = null;
+if (APP) {
+  document.body.classList.add('in-app');
+  // tasti premuti ovunque nel sistema (anche con Roblox in primo piano)
+  APP.suAzione(({ azione, giu }) => {
+    if (azione === 'ptt') { pttGlobale = !!giu; if (giu) assicuraMic(); aggiornaControlli(); return; }
+    if (!giu) return;
+    segnaAttivita();
+    if (azione === 'muta-mic') mutaMic();
+    else if (azione === 'muta-audio') { mutaCuffie(); annuncia(cuffieMutate ? 'Audio spento' : 'Audio acceso'); }
+    else if (azione === 'panico') apriModuloPanico();
+    else if (azione.startsWith('gruppo:') && S.gruppi[azione.slice(7)]) trasmettiGruppo(azione.slice(7));
+  });
+  addEventListener('beforeunload', () => APP.stato({ collegato: false }));
+}
+var timerApp = null, ultimoStatoApp = '';
+function programmaStatoApp() { if (!APP) return; clearTimeout(timerApp); timerApp = setTimeout(inviaStatoApp, 120); }
+function inviaStatoApp() {
+  if (!APP) return;
+  let st;
+  if (!io_ || !socket || !socket.connected) st = { collegato: false };
+  else {
+    const me = mioStato(), r = me && me.radioId ? radioDi(me.radioId) : null, c = r ? cat(r.categoriaId) : null;
+    st = { collegato: true, radio: r ? r.nome : '', reparto: c ? c.nome : '', io: io_.nome, trasmetto, modo: imp.modo, micMutato, cuffieMutate,
+      parlanti: S.online.filter(u => parlanti.has(u.id)).map(u => ({ nome: u.nome, io: u.id === io_.id, gruppo: u.trasmette && S.gruppi[u.trasmette] ? S.gruppi[u.trasmette].nome : '' })),
+      panico: panicoApp };
+  }
+  const j = JSON.stringify(st);
+  if (j !== ultimoStatoApp) { ultimoStatoApp = j; APP.stato(st); }
+}
+if (APP) setInterval(inviaStatoApp, 2000);       // ripasso periodico: copre ingresso, uscita e disconnessioni
+
+// pannello "Tasti e app" dentro le impostazioni audio
+async function riempiPannelloApp() {
+  const box = $('#pannello-app'); if (!box) return;
+  const info = await APP.ottieni();
+  const azioni = [['ptt', 'Parla (da tenere premuto)'], ['muta-mic', 'Microfono acceso / spento'], ['muta-audio', 'Audio acceso / spento'],
+    ['panico', 'Apri il modulo panico'], ['mostra', 'Mostra / nascondi la finestra'], ['overlay', 'Mini-finestra sempre visibile (on/off)'],
+    ...gruppiOrdinati().map(([k, g]) => ['gruppo:' + k, 'Comunica a: ' + g.nome])];
+  const riga = ([a, nome]) => { const t = info.tasti[a] || {};
+    return `<div class="riga-tasto"><span id="lt-${esc(a)}">${esc(nome)}</span>
+      <button class="btn sec picc" data-tasto="${esc(a)}" aria-labelledby="lt-${esc(a)} tv-${esc(a)}"><span id="tv-${esc(a)}">${t.etichetta ? esc(t.etichetta) : '— nessuno —'}</span></button>
+      <button class="btn sec picc" data-cancella="${esc(a)}" aria-label="Rimuovi il tasto: ${esc(nome)}" ${t.etichetta ? '' : 'disabled'}>✕</button></div>`; };
+  const avviso = info.tastiGlobali
+    ? 'Questi tasti funzionano anche mentre giochi a Roblox. Si può usare anche un tasto del mouse (per esempio quelli laterali). Il gioco riceve comunque il tasto premuto: conviene sceglierne uno che il gioco non usa.'
+    : info.motivo === 'permesso'
+      ? 'Per usare i tasti anche con il gioco in primo piano serve il permesso «Accessibilità» (Impostazioni di Sistema → Privacy e sicurezza → Accessibilità → Radio Interna). Dopo averlo concesso, riavvia l\'app.'
+      : 'Su questo computer i tasti globali completi non sono disponibili: funzionano solo lettere, cifre, tasti F e Spazio, e «Parla» diventa un interruttore (premi per parlare, premi ancora per smettere).';
+  box.innerHTML = `<h3>TASTI E APP</h3><p class="nota" role="note">${avviso}</p>
+    ${info.motivo === 'permesso' ? '<button class="btn sec picc" id="ap-riavvia">RIAVVIA L\'APP</button>' : ''}
+    ${azioni.map(riga).join('')}
+    <div class="riga-form"><button class="btn sec picc" id="ap-ripristina">RIPRISTINA I TASTI DI BASE</button></div>
+    <label class="chk"><input type="checkbox" data-app="avvioAutomatico" ${info.avvioAutomatico ? 'checked' : ''}> Avvia Radio Interna con il computer</label>
+    <label class="chk"><input type="checkbox" data-app="inTray" ${info.inTray ? 'checked' : ''}> Chiudendo la finestra la radio resta attiva vicino all'orologio</label>
+    <label class="chk"><input type="checkbox" data-app="overlay" ${info.overlay.attivo ? 'checked' : ''}> Mini-finestra sempre visibile (mostra chi parla anche sopra al gioco)</label>
+    <label class="chk"><input type="checkbox" data-app="overlayClickThrough" ${info.overlay.clickThrough ? 'checked' : ''}> La mini-finestra lascia passare i clic (non si può più spostare)</label>
+    <div class="riga-form"><button class="btn sec picc" id="ap-server">CAMBIA RADIO / SERVER…</button></div>`;
+  const catturaPagina = () => new Promise(ris => {
+    const f = ev => {
+      ev.preventDefault();
+      if (ev.key === 'Escape') { removeEventListener('keydown', f, true); return ris({ annullato: true }); }
+      const m = /^Key([A-Z])$/.exec(ev.code) || /^Digit(\d)$/.exec(ev.code), n = m ? m[1] : (/^F\d+$/.test(ev.code) || ev.code === 'Space') ? ev.code : null;
+      if (!n) return;
+      removeEventListener('keydown', f, true);
+      ris({ tasto: [ev.ctrlKey && 'Ctrl', ev.shiftKey && 'Shift', ev.altKey && 'Alt', ev.metaKey && 'Meta'].filter(Boolean).concat(n).join('+') });
+    };
+    addEventListener('keydown', f, true);
+  });
+  box.onclick = async e => {
+    const c = e.target.closest('[data-cancella]'), b = e.target.closest('[data-tasto]');
+    if (c) { await APP.impostaTasto(c.dataset.cancella, ''); annuncia('Tasto rimosso'); return riempiPannelloApp(); }
+    if (b) {
+      const a = b.dataset.tasto; b.textContent = 'Premi i tasti… (Esc annulla)'; annuncia('Premi ora la combinazione di tasti. Esc per annullare.');
+      const r = info.tastiGlobali ? await APP.catturaTasto() : await catturaPagina();
+      if (r && r.tasto) { const x = await APP.impostaTasto(a, r.tasto); if (x && x.errore) toast('Tasto non valido per questo computer', 'err'); else annuncia('Tasto assegnato'); }
+      return riempiPannelloApp();
+    }
+    if (e.target.id === 'ap-ripristina') { await APP.ripristinaTasti(); annuncia('Tasti ripristinati'); return riempiPannelloApp(); }
+    if (e.target.id === 'ap-riavvia') APP.riavvia();
+    if (e.target.id === 'ap-server') APP.cambiaServer();
+  };
+  box.onchange = async e => { const k = e.target.dataset && e.target.dataset.app; if (k) await APP.impostazione(k, e.target.checked); };
+}
+</script>
+</body>
+</html>

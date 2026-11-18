@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Radio Interna — collegamento</title>
+<style>
+  :root{--rosso:#d0202d;--verde:#2fd27a;--bordo:rgba(255,255,255,.18)}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0,#6b1019 0,#1a0708 55%,#0b0405 100%);color:#fff;
+    font:16px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;display:flex;justify-content:center;padding:28px 16px}
+  main{width:100%;max-width:720px}
+  h1{font-size:30px;letter-spacing:4px;margin:0 0 4px;font-weight:600}
+  .sotto{opacity:.85;margin:0 0 22px}
+  section{background:rgba(0,0,0,.45);border:1px solid var(--bordo);border-radius:8px;padding:18px 20px;margin-bottom:18px}
+  h2{margin:0 0 10px;font-size:19px;letter-spacing:1.5px}
+  label{display:block;font-weight:600;margin:8px 0 4px}
+  input{width:100%;padding:12px;font-size:17px;border-radius:6px;border:2px solid #777;background:#111;color:#fff}
+  input:focus,button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+  button{font:inherit;font-weight:700;letter-spacing:1px;padding:12px 18px;border-radius:6px;border:2px solid transparent;
+    background:var(--rosso);color:#fff;cursor:pointer;margin:6px 8px 0 0}
+  button.sec{background:#222;border-color:#888}
+  button:hover:not(:disabled){filter:brightness(1.2)}
+  button:disabled{opacity:.5;cursor:default}
+  .riga{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+  .riga>div{flex:1;min-width:240px}
+  .err{color:#ffb4b4;background:rgba(160,0,0,.35);border:1px solid #ff7b7b;border-radius:6px;padding:8px 12px;margin:10px 0 0}
+  .ok{color:#9cf2c0}
+  .nota{opacity:.85;font-size:14px}
+  .scatola{background:#0d0d0d;border:1px solid var(--bordo);border-radius:6px;padding:10px 12px;margin:10px 0;word-break:break-all}
+  .scatola b{color:var(--verde)}
+  code{font-family:ui-monospace,Consolas,monospace;font-size:16px}
+  ul{list-style:none;margin:6px 0 0;padding:0}
+  .vis-nascosto{position:absolute;left:-9999px}
+  footer{opacity:.7;font-size:13px;text-align:center}
+  @media (prefers-contrast:more){section{border-width:2px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>📻 RADIO INTERNA</h1>
+  <p class="sotto">Scegli come collegarti. Tutto si può usare anche solo con la tastiera (Tab per spostarsi, Invio per confermare).</p>
+  <div id="annuncio" class="vis-nascosto" role="status" aria-live="polite"></div>
+
+  <section aria-labelledby="t1">
+    <h2 id="t1">1. COLLEGATI A UNA RADIO</h2>
+    <form id="f-collega" class="riga">
+      <div><label for="ind">Indirizzo della radio (te lo manda chi la gestisce)</label>
+        <input id="ind" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://nome.trycloudflare.com"></div>
+      <button id="b-collega" type="submit">COLLEGATI</button>
+    </form>
+    <p id="errore" class="err" role="alert" hidden></p>
+    <ul id="recenti" aria-label="Radio usate di recente"></ul>
+  </section>
+
+  <section aria-labelledby="t2">
+    <h2 id="t2">2. OSPITA LA RADIO SU QUESTO COMPUTER</h2>
+    <p class="nota" style="margin-top:0">Per gestire tu la radio: parte dentro questa app, senza installare altro. Il computer deve restare acceso e connesso finché la radio è in uso.</p>
+    <button id="b-ospita" class="sec" type="button">AVVIA LA RADIO SU QUESTO COMPUTER</button>
+    <div id="blocco-ospite" hidden>
+      <p class="ok" role="status">✔ La radio è accesa su questo computer.</p>
+      <div class="scatola" id="pw" hidden>
+        <div>Password create per te (conservale, non vengono più mostrate dopo i primi avvii):</div>
+        <div>Amministratore — utente <code>admin</code>, password <b><code id="pw-admin"></code></b>
+          <button class="sec" type="button" data-copia="pw-admin" aria-label="Copia la password dell'amministratore">COPIA</button></div>
+        <div>Password staff (insieme al nome del personaggio): <b><code id="pw-staff"></code></b>
+          <button class="sec" type="button" data-copia="pw-staff" aria-label="Copia la password staff">COPIA</button></div>
+      </div>
+      <button id="b-entra-locale" type="button">ENTRA NELLA RADIO</button>
+      <button id="b-tunnel" class="sec" type="button">CREA IL LINK PUBBLICO PER GLI ALTRI</button>
+      <p id="msg-tunnel" class="nota" role="status" aria-live="polite"></p>
+      <div class="scatola" id="blocco-link" hidden>
+        <div>Manda questo link a tutti. Chi ha l'app lo incolla qui sopra; gli altri lo aprono dal browser:</div>
+        <div><b><code id="link"></code></b> <button class="sec" type="button" data-copia="link" aria-label="Copia il link">COPIA</button></div>
+        <div class="nota">Il link cambia ogni volta che lo si ricrea. Se questa finestra si chiude, la radio si spegne.</div>
+      </div>
+      <button id="b-ferma" class="sec" type="button">SPEGNI LA RADIO</button>
+    </div>
+    <p id="errore2" class="err" role="alert" hidden></p>
+  </section>
+  <footer>Radio Interna <span id="ver"></span> · tasti e notifiche si impostano dentro la radio, in ⚙ Audio → Tasti e app</footer>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const annuncia = t => { const a = $('#annuncio'); a.textContent = ''; setTimeout(() => a.textContent = t, 50); };
+let st = null, occupato = false;
+
+function mostraErrore(el, t) { el.hidden = !t; el.textContent = t || ''; if (t) annuncia(t); }
+function render(s) {
+  st = s;
+  $('#ver').textContent = 'v' + s.versione;
+  if (!$('#ind').value && s.ultimo) $('#ind').value = s.ultimo;
+  const ul = $('#recenti'); ul.textContent = '';
+  for (const r of s.recenti) { const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'sec'; b.textContent = r.replace(/^https?:\/\//, ''); b.setAttribute('aria-label', 'Collegati a ' + r);
+    b.onclick = () => collega(r); li.appendChild(b); ul.appendChild(li); }
+  const o = s.ospite;
+  $('#b-ospita').hidden = o.attivo; $('#blocco-ospite').hidden = !o.attivo;
+  mostraErrore($('#errore2'), o.errore);
+  const pw = o.password && (o.password.admin || o.password.staff);
+  $('#pw').hidden = !pw;
+  if (pw) { $('#pw-admin').textContent = o.password.admin || '(già scelta da te)'; $('#pw-staff').textContent = o.password.staff || '(già scelta da te)'; }
+  const t = s.tunnel;
+  $('#b-tunnel').hidden = t.attivo || !!t.messaggio;
+  $('#msg-tunnel').textContent = t.messaggio || '';
+  $('#blocco-link').hidden = !t.url; $('#link').textContent = t.url || '';
+}
+async function collega(url) {
+  if (occupato) return; occupato = true; $('#b-collega').disabled = true; mostraErrore($('#errore'), '');
+  annuncia('Mi collego…');
+  const r = await appCollegati.collega(url);
+  occupato = false; $('#b-collega').disabled = false;
+  if (r && r.errore) mostraErrore($('#errore'), r.errore);
+}
+$('#f-collega').onsubmit = e => { e.preventDefault(); collega($('#ind').value); };
+$('#b-ospita').onclick = async e => {
+  e.target.disabled = true; e.target.textContent = 'Avvio in corso…'; mostraErrore($('#errore2'), '');
+  const r = await appCollegati.ospita(true);
+  e.target.disabled = false; e.target.textContent = 'AVVIA LA RADIO SU QUESTO COMPUTER';
+  if (r && r.errore) mostraErrore($('#errore2'), r.errore); else annuncia('La radio è accesa su questo computer');
+  render(await appCollegati.stato());
+};
+$('#b-ferma').onclick = async () => { await appCollegati.ospita(false); render(await appCollegati.stato()); annuncia('Radio spenta'); };
+$('#b-entra-locale').onclick = () => collega('http://127.0.0.1:' + st.ospite.porta);
+$('#b-tunnel').onclick = async () => {
+  mostraErrore($('#errore2'), '');
+  const r = await appCollegati.tunnel(true);
+  if (r && r.errore) mostraErrore($('#errore2'), r.errore); else annuncia('Link pubblico creato');
+  render(await appCollegati.stato());
+};
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-copia]'); if (!b) return;
+  await appCollegati.copia($('#' + b.dataset.copia).textContent); const v = b.textContent; b.textContent = 'COPIATO ✔'; annuncia('Copiato');
+  setTimeout(() => b.textContent = v, 1500);
+});
+appCollegati.suEvento(render);
+appCollegati.stato().then(s => { render(s); mostraErrore($('#errore'), new URLSearchParams(location.search).get('errore')); $('#ind').focus(); });
+</script>
+</body>
+</html>

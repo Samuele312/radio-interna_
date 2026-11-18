@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Radio Interna — mini-finestra</title>
+<style>
+  html,body{margin:0;background:transparent;overflow:hidden;font:14px/1.35 "Segoe UI",system-ui,-apple-system,sans-serif;color:#fff;user-select:none}
+  #c{margin:4px;border-radius:10px;background:rgba(14,6,7,.88);border:1px solid rgba(255,255,255,.25);box-shadow:0 4px 18px rgba(0,0,0,.5)}
+  #testa{-webkit-app-region:drag;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:8px;cursor:move}
+  #testa b{font-size:14px;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+  .pallino{width:10px;height:10px;border-radius:50%;background:#777;flex:none}
+  .tx .pallino{background:#ff3b47;box-shadow:0 0 8px #ff3b47}
+  .ascolto .pallino{background:#2fd27a}
+  #corpo{padding:8px 12px 10px}
+  .riga{display:flex;align-items:center;gap:8px;padding:2px 0}
+  .riga .p{width:8px;height:8px;border-radius:50%;background:#2fd27a;flex:none}
+  .riga.io .p{background:#ff3b47}
+  .grp{opacity:.8;font-size:12px}
+  .vuoto{opacity:.65}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:9px;background:#444;margin:4px 4px 0 0}
+  .tag.r{background:#a3121e}
+  #panico{background:#a3121e;padding:8px 12px;border-radius:0 0 9px 9px;font-weight:700;animation:lampeggia 1s infinite}
+  @keyframes lampeggia{50%{background:#5a0a10}}
+  @media (prefers-reduced-motion:reduce){#panico{animation:none}}
+</style>
+</head>
+<body>
+<div id="c">
+  <div id="testa"><span class="pallino"></span><b id="radio">Radio Interna</b></div>
+  <div id="corpo" role="status" aria-live="polite"></div>
+  <div id="panico" hidden role="alert"></div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+function render(s) {
+  const c = $('#c'); c.className = !s.collegato ? '' : s.trasmetto ? 'tx' : 'ascolto';
+  $('#radio').textContent = s.collegato ? (s.radio || 'Nessuna radio') : 'Non collegato';
+  const corpo = $('#corpo'); corpo.textContent = '';
+  if (s.collegato && s.radio) {
+    if (!s.parlanti.length) corpo.appendChild(el('div', 'vuoto', 'Silenzio in radio'));
+    for (const p of s.parlanti) { const r = el('div', 'riga' + (p.io ? ' io' : '')); r.appendChild(el('span', 'p'));
+      r.appendChild(el('span', '', p.io ? 'Stai parlando' : p.nome)); if (p.gruppo) r.appendChild(el('span', 'grp', '→ ' + p.gruppo)); corpo.appendChild(r); }
+    const t = el('div');
+    if (s.modo === 'ptt' && s.tastoPtt) t.appendChild(el('span', 'tag', 'Parla: ' + s.tastoPtt));
+    if (s.micMutato) t.appendChild(el('span', 'tag r', 'MIC SPENTO'));
+    if (s.cuffieMutate) t.appendChild(el('span', 'tag r', 'AUDIO SPENTO'));
+    corpo.appendChild(t);
+  } else if (s.collegato) corpo.appendChild(el('div', 'vuoto', 'Entra in una radio per parlare e ascoltare'));
+  else corpo.appendChild(el('div', 'vuoto', 'Apri la radio dalla finestra principale'));
+  const pa = $('#panico');
+  pa.hidden = !s.panico; pa.textContent = s.panico ? `🚨 PANICO: ${s.panico.nome}${s.panico.luogo ? ' — ' + s.panico.luogo : ''}` : '';
+  appOverlay.altezza(document.getElementById('c').offsetHeight + 8);
+}
+appOverlay.suStato(render);
+render({ collegato: false, parlanti: [] });
+appOverlay.pronto();
+</script>
+</body>
+</html>

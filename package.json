@@ -1,0 +1,105 @@
+{
+  "name": "radio-interna",
+  "productName": "Radio Interna",
+  "version": "3.3.0",
+  "description": "Radio vocale per il roleplay Roblox (ER:LC) — app per computer",
+  "main": "main.js",
+  "author": "Radio Interna",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "uiohook-napi": "^1.5.4"
+  },
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "it.radiointerna.app",
+    "productName": "Radio Interna",
+    "copyright": "Radio Interna",
+    "asar": false,
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "ui/**",
+      "server/**",
+      "build/icon.png",
+      "package.json",
+      "!**/uiohook-napi/prebuilds/linux-loong64/**"
+    ],
+    "afterPack": "build/afterPack.js",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "build/icon.png",
+      "identity": null,
+      "hardenedRuntime": false,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Radio Interna usa il microfono per trasmettere la tua voce in radio."
+      }
+    },
+    "dmg": {
+      "title": "Radio Interna"
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "language": "1040"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Network",
+      "target": [
+        "AppImage"
+      ]
+    }
+  }
+}
